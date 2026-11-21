@@ -71,50 +71,88 @@
     lb.addEventListener('touchend', (e) => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1)); tx = null; });
   }
 
-  /* ---------- interaktivní fasáda ---------- */
+  /* ---------- interaktivní fasáda: reflektor na byt, kreslený obrys, štítek ---------- */
   const NS = 'http://www.w3.org/2000/svg';
   $$('[data-facade]').forEach((root) => {
     const P = (window.NK_PROJECTS || {})[root.dataset.facade];
     if (!P || !P.facade) return;
-    const F = P.facade; const [W, H] = F.size;
+    const F = P.facade; const [W, H] = F.size; const uid = String(P.slug).replace(/[^a-z0-9]/gi, '');
     const unitById = Object.fromEntries(P.units.map((u) => [u.id, u]));
-    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'facade__svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('preserveAspectRatio', 'none');
-    const tip = document.createElement('div'); tip.className = 'facade__tip'; tip.setAttribute('aria-hidden', 'true');
-    Object.entries(F.zones).forEach(([id, pts]) => {
+    const mk = (tag, attrs = {}, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+    const ptsAttr = (pts) => pts.map((p) => p.join(',')).join(' ');
+    const bbox = (pts) => { const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]); return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) }; };
+
+    const svg = mk('svg', { class: 'facade__svg', viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none' });
+    const defs = mk('defs', {}, svg);
+    const blur = mk('filter', { id: `fz-blur-${uid}`, x: '-10%', y: '-10%', width: '120%', height: '120%' }, defs);
+    mk('feGaussianBlur', { stdDeviation: Math.round(W / 120) }, blur);
+    const hatch = mk('pattern', { id: `fz-hatch-${uid}`, width: 22, height: 22, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
+    mk('line', { x1: 0, y1: 0, x2: 0, y2: 22, stroke: 'rgba(255,255,255,.4)', 'stroke-width': 5 }, hatch);
+    const mask = mk('mask', { id: `fz-mask-${uid}`, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: W, height: H }, defs);
+    mk('rect', { width: W, height: H, fill: '#fff' }, mask);
+    const hole = mk('polygon', { points: '', fill: '#000', filter: `url(#fz-blur-${uid})` }, mask);
+    mk('rect', { class: 'facade__dim', width: W, height: H, mask: `url(#fz-mask-${uid})` }, svg);
+    const glow = mk('polygon', { class: 'facade__glow', points: '', filter: `url(#fz-blur-${uid})` }, svg);
+    const zonesG = mk('g', { class: 'facade__zones' }, svg);
+    const marksG = mk('g', { class: 'facade__marks' }, svg);
+    const card = document.createElement('div'); card.className = 'facade__card'; card.setAttribute('aria-hidden', 'true');
+
+    const zones = {};
+    let active = null, selected = null;
+
+    const setLit = (id) => {
+      active = id;
+      const z = id && zones[id];
+      Object.values(zones).forEach((o) => { o.g.classList.toggle('is-on', o === z); o.m.classList.toggle('is-on', o === z); });
+      if (!z) { root.classList.remove('is-lit'); card.classList.remove('is-on'); return; }
+      hole.setAttribute('points', z.pts); glow.setAttribute('points', z.pts);
+      root.classList.add('is-lit', 'has-hovered');
+      const u = z.u;
+      card.innerHTML = `<strong>Byt ${esc(id)}</strong><span>${esc(u.disposition)} · ${area(u.areaNV || u.area)}${u.terrace != null ? ` + ${area(u.terrace)} ${esc((u.outdoorLabel || 'terasa').toLowerCase())}` : ''}</span>${u.status === 'available' && u.price != null && CFG.priceMode !== 'onRequest' ? `<span>${kc(u.price)}</span>` : ''}<em class="st-${u.status}">${STATUS[u.status]}</em>${u.status !== 'sold' ? '<i>Kliknutím otevřete detail a půdorys</i>' : ''}`;
+      const r = root.getBoundingClientRect();
+      const cx = ((z.b.x0 + z.b.x1) / 2 / W) * r.width;
+      const top = (z.b.y0 / H) * r.height;
+      card.style.left = `${Math.max(130, Math.min(r.width - 130, cx))}px`;
+      card.style.top = `${top}px`;
+      card.classList.toggle('is-below', top < 190);
+      card.classList.add('is-on');
+    };
+
+    Object.entries(F.zones).forEach(([id, pts], i) => {
       const u = unitById[id]; if (!u) return;
-      const poly = document.createElementNS(NS, 'polygon');
-      poly.setAttribute('points', pts.map((p) => p.join(',')).join(' '));
-      poly.setAttribute('class', `facade__zone st-${u.status}`);
-      poly.setAttribute('tabindex', '0'); poly.setAttribute('role', 'button');
-      poly.setAttribute('aria-label', `Byt ${id}, ${u.disposition}, ${area(u.areaNV || u.area)}, ${STATUS[u.status]}`);
-      poly.dataset.unit = id;
-      const bx = pts.map((p) => p[0]), by = pts.map((p) => p[1]);
-      const cx = (Math.min(...bx) + Math.max(...bx)) / 2, cy = (Math.min(...by) + Math.max(...by)) / 2;
-      const label = document.createElementNS(NS, 'text'); label.setAttribute('class', 'facade__label'); label.setAttribute('x', cx); label.setAttribute('y', cy + 18); label.setAttribute('text-anchor', 'middle'); label.setAttribute('font-size', Math.round(W / 42)); label.textContent = id;
-      svg.appendChild(poly); svg.appendChild(label);
-      const showTip = () => {
-        tip.innerHTML = `<strong>Byt ${esc(id)}</strong><span>${esc(u.disposition)} · ${area(u.areaNV || u.area)}${u.terrace != null ? ` + ${area(u.terrace)} ${esc((u.outdoorLabel || 'terasa').toLowerCase())}` : ''}</span>${u.status === 'available' && u.price != null && CFG.priceMode !== 'onRequest' ? `<span>${kc(u.price)}</span>` : ''}<em class="st-${u.status}">${STATUS[u.status]}</em>`;
-        const r = root.getBoundingClientRect(); const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
-        tip.style.left = `${((Math.min(...xs) + Math.max(...xs)) / 2 / W) * r.width}px`;
-        tip.style.top = `${(Math.min(...ys) / H) * r.height + 8}px`;
-        tip.classList.add('is-on');
-      };
-      poly.addEventListener('mouseenter', showTip); poly.addEventListener('focus', showTip);
-      poly.addEventListener('mouseleave', () => tip.classList.remove('is-on')); poly.addEventListener('blur', () => tip.classList.remove('is-on'));
+      const b = bbox(pts);
+      const g = mk('g', { class: `facade__zone st-${u.status}`, 'data-unit': id }, zonesG);
+      const hit = mk('polygon', { class: 'facade__hit', points: ptsAttr(pts), tabindex: 0, role: 'button', 'aria-label': `Byt ${id}, ${u.disposition}, ${area(u.areaNV || u.area)}, ${STATUS[u.status]}` }, g);
+      if (u.status === 'reserved') hit.style.fill = `url(#fz-hatch-${uid})`;
+      mk('polygon', { class: 'facade__line', points: ptsAttr(pts), pathLength: 1 }, g);
+      // značka bytu (klidový stav)
+      const mx = (b.x0 + b.x1) / 2, my = (b.y0 + b.y1) / 2;      // pozice přes cx/cy – CSS animace používá transform
+      const m = mk('g', { class: `facade__mark st-${u.status}` }, marksG);
+      m.style.animationDelay = `${(i * 0.45) % 3.2}s`;
+      mk('circle', { r: Math.round(W / 92), cx: mx, cy: my }, m);
+      const t = mk('text', { x: mx, y: my, 'font-size': Math.round(W / 95) }, m); t.textContent = id;
+      zones[id] = { g, m, u, b, pts: ptsAttr(pts) };
+
+      const restore = () => setLit(selected);
+      hit.addEventListener('mouseenter', () => setLit(id)); hit.addEventListener('focus', () => setLit(id));
+      hit.addEventListener('mouseleave', restore); hit.addEventListener('blur', restore);
       const go = () => {
         if (u.status === 'sold') return;
-        $$('.facade__zone', svg).forEach((z) => z.classList.toggle('is-selected', z === poly));
-        if (window.NK_EXPLORER && window.NK_EXPLORER.project === P.slug) { window.NK_EXPLORER.selectUnit(id, true); }
-        else { const t = $('#byty'); if (t) t.scrollIntoView({ behavior: 'smooth' }); }
+        selected = id; setLit(id); root.classList.add('is-selected');
+        if (window.NK_EXPLORER && window.NK_EXPLORER.project === P.slug) window.NK_EXPLORER.selectUnit(id, true);
+        else { const tgt = $('#byty'); if (tgt) tgt.scrollIntoView({ behavior: 'smooth' }); }
       };
-      poly.addEventListener('click', go);
-      poly.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+      hit.addEventListener('click', go);
+      hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
     });
-    root.appendChild(svg); root.appendChild(tip);
-    document.addEventListener('nk:unit', (e) => { $$('.facade__zone', svg).forEach((z) => z.classList.toggle('is-selected', z.dataset.unit === e.detail.unit)); });
-    // ukázat štítky, dokud uživatel nenajede myší
-    root.classList.add('show-labels');
-    root.addEventListener('mouseenter', () => root.classList.remove('show-labels'), { once: true });
+
+    root.appendChild(svg); root.appendChild(card);
+    document.addEventListener('nk:unit', (e) => {
+      selected = e.detail.unit && zones[e.detail.unit] ? e.detail.unit : null;
+      root.classList.toggle('is-selected', !!selected);
+      setLit(selected);
+    });
+    addEventListener('resize', () => { if (active) setLit(active); }, { passive: true });
   });
 
   /* ---------- příslušenství + rezervační tabulka ---------- */

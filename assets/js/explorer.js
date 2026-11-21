@@ -41,21 +41,11 @@
     return { main: `${nf.format(u.price)} Kč`, sub };
   }
 
-  /* ---------- axonometrie ---------- */
+  /* ---------- axonometrie z obrysů skutečných půdorysů ---------- */
   const S = 6.2, C = Math.cos(Math.PI / 6);
   const iso = (x, y, z) => [(x - y) * C * S, (x + y) * 0.5 * S - z * S];
   const pt = (arr) => arr.map(([x, y, z]) => iso(x, y, z).map((n) => n.toFixed(1)).join(' ')).join('L');
-
-  function isoBox(parent, r, z, h, cls, data = {}) {
-    const x1 = r.x + r.w, y1 = r.y + r.d, zt = z + h;
-    const g = el('g', { class: cls }, parent);
-    for (const k in data) g.setAttribute(k, data[k]);
-    el('path', { class: 'f-l', d: 'M' + pt([[r.x, y1, z], [x1, y1, z], [x1, y1, zt], [r.x, y1, zt]]) + 'Z' }, g);
-    el('path', { class: 'f-r', d: 'M' + pt([[x1, r.y, z], [x1, y1, z], [x1, y1, zt], [x1, r.y, zt]]) + 'Z' }, g);
-    el('path', { class: 'f-t', d: 'M' + pt([[r.x, r.y, zt], [x1, r.y, zt], [x1, y1, zt], [r.x, y1, zt]]) + 'Z' }, g);
-    return g;
-  }
-  const centerKey = (r) => r.x + r.w / 2 + r.y + r.d / 2;
+  const centroid = (poly) => poly.reduce((a, p) => [a[0] + p[0] / poly.length, a[1] + p[1] / poly.length], [0, 0]);
 
   function buildStack() {
     const svg = $('#ex-stack');
@@ -63,44 +53,64 @@
     const defs = el('defs', {}, svg);
     const pat = el('pattern', { id: 'hatch-s', width: 5, height: 5, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
     el('line', { x1: 0, y1: 0, x2: 0, y2: 5, stroke: 'currentColor', 'stroke-width': 1.1 }, pat);
-
     const world = el('g', { class: 'world' }, svg);
     let bb = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 };
-    const track = (r, z, h) => {
-      for (const [x, y, zz] of [[r.x, r.y, z], [r.x + r.w, r.y, z], [r.x, r.y + r.d, z + h], [r.x + r.w, r.y + r.d, z], [r.x + r.w, r.y + r.d, z + h], [r.x, r.y, z + h]]) {
-        const [a, b] = iso(x, y, zz);
-        bb = { x0: Math.min(bb.x0, a), y0: Math.min(bb.y0, b), x1: Math.max(bb.x1, a), y1: Math.max(bb.y1, b) };
-      }
-    };
+    const track = (a, b) => { bb = { x0: Math.min(bb.x0, a), y0: Math.min(bb.y0, b), x1: Math.max(bb.x1, a), y1: Math.max(bb.y1, b) }; };
 
-    [...P.floors].reverse().forEach((f) => {          // 1.PP první → 3.NP naposled (vykresluje se nad ním)
-      const geo = P.geometry[f.id];
+    // obrys podlaží: vlastní, nebo nejbližšího podlaží nad ním (suterén nemá vlastní obrys)
+    const planFor = (i) => { for (let j = i; j >= 0; j--) { const pl = P.plans && P.plans[P.floors[j].id]; if (pl && pl.outline) return pl; } return null; };
+    const toM = (pl, [px, py]) => [(px - pl.origin[0]) / pl.scale, (py - pl.origin[1]) / pl.scale];
+    const polyM = (pl, pts) => pts.map((p) => toM(pl, p));
+
+    // hranol z půdorysného polygonu: viditelné boční stěny (směrem k divákovi) + horní deska
+    const prism = (parent, poly, z, h, cls, data = {}) => {
+      const g = el('g', { class: cls }, parent);
+      for (const key in data) g.setAttribute(key, data[key]);
+      const area2 = poly.reduce((acc, p, i) => { const q = poly[(i + 1) % poly.length]; return acc + (p[0] * q[1] - q[0] * p[1]); }, 0);
+      const sgn = area2 > 0 ? 1 : -1;
+      const faces = [];
+      poly.forEach((p, i) => {
+        const q = poly[(i + 1) % poly.length];
+        const nx = sgn * (q[1] - p[1]), ny = sgn * -(q[0] - p[0]);     // vnější normála hrany
+        if (nx + ny <= 0) return;                                      // odvrácená stěna
+        faces.push({ key: (p[0] + q[0] + p[1] + q[1]) / 2, cls: ny >= nx ? 'f-l' : 'f-r', d: 'M' + pt([[p[0], p[1], z], [q[0], q[1], z], [q[0], q[1], z + h], [p[0], p[1], z + h]]) + 'Z' });
+      });
+      faces.sort((m, n) => m.key - n.key).forEach((f) => el('path', { class: f.cls, d: f.d }, g));
+      el('path', { class: 'f-t', d: 'M' + pt(poly.map(([x, y]) => [x, y, z + h])) + 'Z' }, g);
+      poly.forEach(([x, y]) => { track(...iso(x, y, z)); track(...iso(x, y, z + h)); });
+      return g;
+    };
+    const flat = (parent, poly, z, cls) => el('path', { class: cls, d: 'M' + pt(poly.map(([x, y]) => [x, y, z])) + 'Z' }, parent);
+
+    [...P.floors].map((f, i) => [f, planFor(i)]).reverse().forEach(([f, pl]) => {   // odspodu nahoru (horní se kreslí naposled)
+      if (!pl) return;
       const fg = el('g', { class: 'sf', 'data-floor': f.id, tabindex: 0, role: 'button', 'aria-label': `Zobrazit ${f.long}` }, world);
-      const items = [];
-      if (f.type === 'basement') {
-        const o = geo.outline;
-        items.push({ r: geo.garage || { x: o[0], y: o[1], w: o[2] - o[0], d: o[3] - o[1] }, h: 1.0, cls: 'sb-garage' });
+      const O = polyM(pl, pl.outline);
+      const own = P.plans && P.plans[f.id] && P.plans[f.id].outline ? P.plans[f.id] : null;
+      if (f.type === 'basement' || !own) {
+        prism(fg, O, f.z, 1.0, 'sb-garage');
       } else {
-        geo.common.forEach((c) => items.push({ r: c, h: 1.0, cls: 'sb-common' }));
-        Object.entries(geo.units).forEach(([id, g]) => {
-          g.terraces.forEach((t) => items.push({ r: t, h: 0.35, cls: 'sb-terrace', unit: id }));
-          items.push({ r: g.body, h: 1.6, cls: `su st-${unitById[id].status}`, unit: id, body: true });
+        prism(fg, O, f.z, 0.45, 'sb-slab');
+        (own.terraces || []).forEach((t) => flat(fg, polyM(own, t), f.z + 0.45, 'sb-terrace'));
+        const items = [];
+        (own.common || []).forEach((c) => items.push({ poly: polyM(own, c), h: 1.0, cls: 'sb-common' }));
+        Object.entries(own.bodies || own.zones || {}).forEach(([id, poly]) => {
+          if (!unitById[id]) return;
+          items.push({ poly: polyM(own, poly), h: 1.6, cls: `su st-${unitById[id].status}`, unit: id });
+        });
+        items.sort((m, n) => { const cm = centroid(m.poly), cn = centroid(n.poly); return (cm[0] + cm[1]) - (cn[0] + cn[1]); });
+        items.forEach((it) => {
+          prism(fg, it.poly, f.z + 0.45, it.h, it.cls, it.unit ? { 'data-unit': it.unit } : {});
+          if (it.unit) {
+            const c = centroid(it.poly);
+            const [cx, cy] = iso(c[0], c[1], f.z + 0.45 + it.h);
+            const t = el('text', { class: 'su-label', x: cx.toFixed(1), y: (cy + 3).toFixed(1), 'text-anchor': 'middle' }, fg);
+            t.textContent = it.unit;
+          }
         });
       }
-      items.sort((a, b) => centerKey(a.r) - centerKey(b.r));
-      items.forEach((it) => {
-        const data = it.unit && it.body ? { 'data-unit': it.unit } : {};
-        isoBox(fg, it.r, f.z, it.h, it.cls, data);
-        track(it.r, f.z, it.h);
-        if (it.body) {
-          const [cx, cy] = iso(it.r.x + it.r.w / 2, it.r.y + it.r.d / 2, f.z + it.h);
-          const t = el('text', { class: 'su-label', x: cx.toFixed(1), y: (cy + 3).toFixed(1), 'text-anchor': 'middle' }, fg);
-          t.textContent = it.unit;
-        }
-      });
-      // popisek patra vpravo od desky
-      const o = geo.outline;
-      const [lx, ly] = iso(o[0] + o[2], o[1] + o[3] * 0.5, f.z);
+      const xs = O.map((p) => p[0]), ys = O.map((p) => p[1]);
+      const [lx, ly] = iso(Math.max(...xs), (Math.min(...ys) + Math.max(...ys)) / 2, f.z);
       const lab = el('text', { class: 'sf-label', x: (lx + 14).toFixed(1), y: (ly + 4).toFixed(1) }, fg);
       lab.textContent = f.label;
       bb.x1 = Math.max(bb.x1, lx + 60);
@@ -147,7 +157,7 @@
     });
   }
 
-  /* ---------- půdorys (schéma) ---------- */
+  /* ---------- půdorys ---------- */
   function buildPlan() {
     const svg = $('#ex-plan');
     svg.innerHTML = '';
@@ -155,74 +165,12 @@
     const f = floorById[state.floor];
     const pl = P.plans && P.plans[f.id];
     const note = $('#ex-note');
-    if (pl) {
+    if (pl && pl.image) {
       if (note) note.textContent = P.planNote || 'Půdorys z projektové dokumentace.';
       return buildImagePlan(svg, f, pl);
     }
-    if (note && !note.dataset.def) note.dataset.def = note.textContent;
-    if (note) note.textContent = note.dataset.def;
-    const geo = P.geometry[f.id];
-    const o = geo.outline, pad = 1.6;
-    svg.setAttribute('viewBox', `${o[0] - pad} ${o[1] - pad} ${o[2] - o[0] + pad * 2} ${o[3] - o[1] + pad * 2}`);
-    svg.setAttribute('aria-label', `Schématický půdorys – ${f.long}`);
-    svg.style.setProperty('--k', ((o[2] - o[0] + 2 * pad) / 32).toFixed(3));   // stálá velikost písma na obrazovce
-
-    const defs = el('defs', {}, svg);
-    const pat = el('pattern', { id: 'hatch-p', width: 0.7, height: 0.7, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
-    el('line', { x1: 0, y1: 0, x2: 0, y2: 0.7, stroke: 'currentColor', 'stroke-width': 0.09 }, pat);
-
-    const label = (parent, x, y, text, cls, anchor = 'middle') => {
-      const lines = String(text).split(' · ');
-      const t = el('text', { x, y: lines.length > 1 ? y - 0.45 : y, class: cls, 'text-anchor': anchor }, parent);
-      lines.forEach((ln, i) => { const ts = el('tspan', { x, dy: i ? 1.0 : 0 }, t); ts.textContent = ln; });
-      return t;
-    };
-
-    if (f.type === 'basement') {
-      const gr = geo.garage || { x: o[0], y: o[1], w: o[2] - o[0], d: o[3] - o[1] };
-      el('rect', { class: 'p-garage', x: gr.x, y: gr.y, width: gr.w, height: gr.d }, svg);
-      (geo.common || []).forEach((c) => {
-        el('rect', { class: 'p-common', x: c.x, y: c.y, width: c.w, height: c.d }, svg);
-        label(svg, c.x + c.w / 2, c.y + c.d / 2 + 0.3, c.label, 'p-small');
-      });
-      (geo.cellars || []).forEach((c, i) => {
-        const g = el('g', { class: 'p-cellar' }, svg);
-        el('title', {}, g).textContent = `Sklep ${i + 1} · ${area(P.cellars[i].area)}`;
-        el('rect', { x: c.x, y: c.y, width: c.w, height: c.d }, g);
-        label(g, c.x + c.w / 2, c.y + c.d / 2 + 0.45, `S${i + 1}`, 'p-num');
-      });
-      (geo.stalls || []).forEach((s, i) => {
-        const g = el('g', { class: 'p-stall' + (P.parking[i].accessible ? ' is-accessible' : '') }, svg);
-        el('title', {}, g).textContent = `Stání ${i + 1}${P.parking[i].accessible ? ' (pro osoby s omezenou schopností pohybu)' : ''}`;
-        el('rect', { x: s.x, y: s.y, width: s.w, height: s.d }, g);
-        label(g, s.x + s.w / 2, s.y + s.d - 0.9, String(i + 1), 'p-num');
-      });
-      if (geo.lane) label(svg, geo.lane[0], geo.lane[1], 'jízdní pás', 'p-small p-muted');
-      return;
-    }
-
-    geo.common.forEach((c) => {
-      el('rect', { class: 'p-common', x: c.x, y: c.y, width: c.w, height: c.d }, svg);
-      label(svg, c.x + c.w / 2, c.y + c.d / 2 + 0.3, c.label, 'p-small');
-    });
-
-    Object.entries(geo.units).forEach(([id, g]) => {
-      const u = unitById[id];
-      const grp = el('g', {
-        class: `pu st-${u.status}` + (state.unit === id ? ' is-selected' : ''),
-        'data-unit': id, tabindex: 0, role: 'button', 'aria-pressed': state.unit === id,
-        'aria-label': `Byt ${id}, ${u.disposition}, ${area(u.areaNV || u.area)}, ${STATUS[u.status]}`,
-      }, svg);
-      g.terraces.forEach((t) => el('rect', { class: 'p-terrace', x: t.x, y: t.y, width: t.w, height: t.d }, grp));
-      const b = g.body;
-      el('rect', { class: 'p-body', x: b.x, y: b.y, width: b.w, height: b.d }, grp);
-      el('rect', { class: 'p-hatch', x: b.x, y: b.y, width: b.w, height: b.d }, grp);
-      const cx = b.x + b.w / 2, cy = b.y + b.d / 2;
-      label(grp, cx, cy - 0.2, id, 'p-id');
-      label(grp, cx, cy + 1.5, `${u.disposition} · ${area(u.area)}`, 'p-meta');
-      const t0 = g.terraces[0];
-      if (t0) label(grp, t0.x + t0.w / 2, t0.y + t0.d / 2 + 0.3, u.terrace != null ? `terasa · ${area(u.terrace)}` : (u.outdoor || 'terasa'), 'p-small p-terlabel');
-    });
+    svg.setAttribute('viewBox', '0 0 100 20');
+    if (note) note.textContent = 'Půdorys tohoto podlaží doplníme.';
   }
 
   /* ---------- patra (tlačítka) ---------- */

@@ -64,11 +64,12 @@
   <main id="obsah">
 
     <!-- ============ HERO ============ -->
-    <section class="hero-media dark" id="top">
+    <section class="hero-media dark" id="top" data-atmo="mist">
       <div class="hero-media__bg is-slides">
         <img src="assets/img/ke-schodum/bdks_19-1200.webp" srcset="assets/img/ke-schodum/bdks_19-600.webp 600w, assets/img/ke-schodum/bdks_19-1200.webp 1200w, assets/img/ke-schodum/bdks_19-2400.webp 2400w" sizes="100vw" data-full="assets/img/ke-schodum/bdks_19-2400.webp" alt="Rezidence ke Schodům za soumraku" fetchpriority="high">
         <img src="assets/img/do-ctvrti/bddc_01a-1200.webp" srcset="assets/img/do-ctvrti/bddc_01a-600.webp 600w, assets/img/do-ctvrti/bddc_01a-1200.webp 1200w, assets/img/do-ctvrti/bddc_01a-2400.webp 2400w" sizes="100vw" data-full="assets/img/do-ctvrti/bddc_01a-2400.webp" alt="Rezidence Do Čtvrti za soumraku" loading="lazy">
       </div>
+      <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
         <p class="eyebrow" data-reveal>Nico &amp; Kai Development</p>
         <h1 class="display">
@@ -274,5 +275,6 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/site.js"></script>
+  <script src="assets/js/atmo.js" defer></script>
 </body>
 </html>

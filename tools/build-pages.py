@@ -125,7 +125,7 @@ def scripts(rel, data=(), explorer=False):
     for d in data: s += f'  <script src="{rel}assets/data/{d}.js"></script>\n'
     s += f'  <script src="{rel}assets/js/main.js"></script>\n'
     if explorer: s += f'  <script src="{rel}assets/js/explorer.js"></script>\n'
-    s += f'  <script src="{rel}assets/js/site.js"></script>\n</body>\n</html>\n'
+    s += f'  <script src="{rel}assets/js/site.js"></script>\n  <script src="{rel}assets/js/atmo.js" defer></script>\n</body>\n</html>\n'
     return s
 
 def form(project, with_unit=True, extras=True, title=("Zarezervujte si", "svůj byt."), lead="", how=(), submit="Odeslat žádost o rezervaci", eyebrow=("05", "Rezervace"), rel="../"):
@@ -241,8 +241,9 @@ def project_page(c):
     html += header(rel, nav, "#byty", "Vybrat byt", nav + [(rel, "Všechny projekty")])
     html += f"""
     <!-- ============ HERO ============ -->
-    <section class="hero-media dark" id="top">
+    <section class="hero-media dark" id="top" data-atmo="mist">
       <div class="hero-media__bg">{img(I(c['hero']), c['hero_alt'], sizes="100vw", lazy=False)}</div>
+      <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
         <p class="chip" data-reveal><i aria-hidden="true"></i>{c['stage']} · stavební řízení zahájeno</p>
         <h1 class="display">
@@ -306,7 +307,7 @@ def project_page(c):
         </div>
 
         <div class="facade" data-facade="{c['slug']}" data-reveal>
-          <img class="facade__img" src="{I(c['facade'])[:-5]}-2400.webp" srcset="{I(c['facade'])[:-5]}-1200.webp 1200w, {I(c['facade'])[:-5]}-2400.webp 2400w" sizes="(max-width: 1520px) 100vw, 1520px" width="2528" height="1696" alt="{c['facade_alt']}">
+          <img class="facade__img" src="{I(c['facade'])[:-5]}-2400.webp" srcset="{I(c['facade'])[:-5]}-1200.webp 1200w, {I(c['facade'])[:-5]}-2400.webp 2400w" sizes="(max-width: 1520px) 100vw, 1520px" width="2400" height="1610" alt="{c['facade_alt']}">
           <span class="facade__hint">Najeďte myší na byt</span>
         </div>
         <p class="facade__legend" data-reveal><span class="lg-available"><i></i>Volný</span><span class="lg-reserved"><i></i>Rezervovaný</span><span class="lg-sold"><i></i>Prodaný</span><span>Kliknutím otevřete detail bytu a půdorys</span></p>
@@ -395,7 +396,7 @@ KS = dict(
             ("bdks_18", "Detail fasády z patinovaného plechu", "Materiály, které stárnou krásně.", "<p>Fasáda z&nbsp;plechových panelů s&nbsp;přiznanými spárami mění barvu během dne. Uvnitř pohledový beton, třívrstvé dřevěné podlahy a&nbsp;minerální stěrky. Nic, co by se za pár let muselo předělávat.</p>"),
             ("bdks_20", "Pavlač na severní straně domu", "Soukromí na prvním místě.", "<p>Do bytů se vchází z&nbsp;otevřených pavlačí na severní straně. Obytné místnosti a&nbsp;terasy míří na jih, do zahrady. Mezi byty je železobetonová stěna, sousedy neuslyšíte.</p>")],
     facade="bdks_02", facade_alt="Jižní průčelí Rezidence ke Schodům – vyberte byt najetím myší",
-    plan_note="Schematický půdorys. Plochy a&nbsp;dispozice dle projektové dokumentace (12/2025), závazné jsou údaje z&nbsp;prohlášení vlastníka.",
+    plan_note="Půdorys z projektové dokumentace (12/2025). Plochy a&nbsp;dispozice dle projektu, závazné jsou údaje z&nbsp;prohlášení vlastníka.",
     cad_note="Půdorys z projektové dokumentace pro povolení stavby (12/2025). Vybavení a zařízení je ilustrativní.",
     price_note="Plocha bytu je uvedena jako odhad podlahové plochy dle nařízení vlády č. 366/2013 Sb., závazná bude v&nbsp;prohlášení vlastníka.",
     tech_h=("Dům, který", "šetří energii."),
@@ -465,8 +466,9 @@ def vysoke_page():
     html = head("Apartmány Vysoké | Nico &amp; Kai Development", "Apartmány Vysoké nad Jizerou: dokončené horské apartmány s terasami, zahradou a jezírkem. Poslední tři jednotky A2, B1 a B2 v prodeji.", "og-vysoke.jpg", rel, "vysoke")
     html += header(rel, nav, "#kontakt", "Mám zájem", nav + [(rel, "Všechny projekty")])
     html += f"""
-    <section class="hero-media dark" id="top">
+    <section class="hero-media dark" id="top" data-atmo="snow">
       <div class="hero-media__bg">{img(I('l03'), 'Zimní západ slunce nad Vysokým nad Jizerou', sizes='100vw', lazy=False)}</div>
+      <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
         <p class="chip" data-reveal><i aria-hidden="true"></i>Dokončeno · poslední 3 apartmány</p>
         <h1 class="display">
@@ -743,11 +745,12 @@ def home_page():
     html += header(rel, nav, "ke-schodum/", "Vybrat byt", nav)
     html += f"""
     <!-- ============ HERO ============ -->
-    <section class="hero-media dark" id="top">
+    <section class="hero-media dark" id="top" data-atmo="mist">
       <div class="hero-media__bg is-slides">
         {img(I('ke-schodum/bdks_19'), 'Rezidence ke Schodům za soumraku', sizes='100vw', lazy=False)}
         {img(I('do-ctvrti/bddc_01a'), 'Rezidence Do Čtvrti za soumraku', sizes='100vw')}
       </div>
+      <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
         <p class="eyebrow" data-reveal>Nico &amp; Kai Development</p>
         <h1 class="display">
