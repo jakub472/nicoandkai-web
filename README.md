@@ -25,6 +25,14 @@ assets/css/site.css              komponenty webu; styles.css = základ a typogra
 assets/img/<projekt>/            vizualizace a fotky ve 3 šířkách (600/1200/1800–2400 px, WebP)
 ```
 
+## Jazyky (CS / EN / DE)
+
+Čeština je v kořeni, angličtina v `en/`, němčina v `de/` (stejné adresy stránek; GDPR je `en/privacy/` a `de/datenschutz/`).
+Všechny texty stránek jsou v `tools/i18n.py` (UI, projekty, úvod, Vysoké, Vlnitá, GDPR); texty vykreslované skriptem
+(stavy, patra, místnosti, ceník, formulář) překládají slovníky `assets/i18n/en.js` a `de.js` s českými originály jako klíči.
+Nový text v datech (`assets/data/*.js`) stačí přidat do obou slovníků, jinak zůstane česky. Přepínač jazyků je v hlavičce,
+v mobilním menu a v patičce; každá stránka má `hreflang` odkazy a sitemap obsahuje všechny jazyky.
+
 ## Nasazení (GitHub Pages, doména nicoandkai.com)
 
 Repozitář: `jakub472/nicoandkai-web` (větev `main`, kořen = tato složka). Každý push na `main` web během minuty nasadí.

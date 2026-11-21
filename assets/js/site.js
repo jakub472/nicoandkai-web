@@ -5,11 +5,14 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const CFG = window.NK_CONFIG || {};
-  const nf = new Intl.NumberFormat('cs-CZ');
-  const nfa = new Intl.NumberFormat('cs-CZ', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
-  const kc = (n) => `${nf.format(n)} Kč`;
+  const tr = (k) => { const key = String(k).replace(/\u00a0/g, ' '); return (window.NK_DICT && Object.prototype.hasOwnProperty.call(window.NK_DICT, key)) ? window.NK_DICT[key] : k; };
+  const tpl = (k, vars) => tr(k).replace(/\{(\w+)\}/g, (m, v) => (v in vars ? vars[v] : m));
+  const LOC = window.NK_LOCALE || 'cs-CZ';
+  const nf = new Intl.NumberFormat(LOC);
+  const nfa = new Intl.NumberFormat(LOC, { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+  const kc = (n) => `${nf.format(n)} ${tr('Kč')}`;
   const area = (v) => `${nfa.format(v)} m²`;
-  const STATUS = { available: 'Volný', reserved: 'Rezervovaný', sold: 'Prodaný' };
+  const STATUS = { available: tr('Volný'), reserved: tr('Rezervovaný'), sold: tr('Prodaný') };
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   /* ---------- splash (jen jednou za návštěvu) ---------- */
@@ -75,7 +78,7 @@
   let lb = $('#lightbox');
   if (!lb && $('.gallery')) {
     lb = document.createElement('dialog'); lb.id = 'lightbox'; lb.className = 'lightbox';
-    lb.innerHTML = '<div class="lightbox__stage"><img alt=""><button class="lightbox__btn lightbox__prev" type="button" aria-label="Předchozí">←</button><button class="lightbox__btn lightbox__next" type="button" aria-label="Další">→</button><button class="lightbox__close" type="button">Zavřít ✕</button><p class="lightbox__cap"></p></div>';
+    lb.innerHTML = `<div class="lightbox__stage"><img alt=""><button class="lightbox__btn lightbox__prev" type="button" aria-label="${tr('Předchozí')}">←</button><button class="lightbox__btn lightbox__next" type="button" aria-label="${tr('Další')}">→</button><button class="lightbox__close" type="button">${tr('Zavřít ✕')}</button><p class="lightbox__cap"></p></div>`;
     document.body.appendChild(lb);
   }
   if (lb) {
@@ -138,7 +141,7 @@
       hole.setAttribute('points', z.pts); glow.setAttribute('points', z.pts);
       root.classList.add('is-lit', 'has-hovered');
       const u = z.u;
-      card.innerHTML = `<strong>Byt ${esc(id)}</strong><span>${esc(u.disposition)} · ${area(u.areaNV || u.area)}${u.terrace != null ? ` + ${area(u.terrace)} ${esc((u.outdoorLabel || 'terasa').toLowerCase())}` : ''}</span>${u.status === 'available' && u.price != null && CFG.priceMode !== 'onRequest' ? `<span>${kc(u.price)}</span>` : ''}<em class="st-${u.status}">${STATUS[u.status]}</em>${u.status !== 'sold' ? '<i>Kliknutím otevřete detail a půdorys</i>' : ''}`;
+      card.innerHTML = `<strong>${tr('Byt')} ${esc(id)}</strong><span>${esc(u.disposition)} · ${area(u.areaNV || u.area)}${u.terrace != null ? ` + ${area(u.terrace)} ${esc(LOC.startsWith('de') ? tr(u.outdoorLabel || 'Terasa') : tr(u.outdoorLabel || 'Terasa').toLowerCase())}` : ''}</span>${u.status === 'available' && u.price != null && CFG.priceMode !== 'onRequest' ? `<span>${kc(u.price)}</span>` : ''}<em class="st-${u.status}">${STATUS[u.status]}</em>${u.status !== 'sold' ? `<i>${tr('Kliknutím otevřete detail a půdorys')}</i>` : ''}`;
       const r = root.getBoundingClientRect();
       const cx = ((z.b.x0 + z.b.x1) / 2 / W) * r.width;
       const top = (z.b.y0 / H) * r.height;
@@ -152,7 +155,7 @@
       const u = unitById[id]; if (!u) return;
       const b = bbox(pts);
       const g = mk('g', { class: `facade__zone st-${u.status}`, 'data-unit': id }, zonesG);
-      const hit = mk('polygon', { class: 'facade__hit', points: ptsAttr(pts), tabindex: 0, role: 'button', 'aria-label': `Byt ${id}, ${u.disposition}, ${area(u.areaNV || u.area)}, ${STATUS[u.status]}` }, g);
+      const hit = mk('polygon', { class: 'facade__hit', points: ptsAttr(pts), tabindex: 0, role: 'button', 'aria-label': `${tr('Byt')} ${id}, ${u.disposition}, ${area(u.areaNV || u.area)}, ${STATUS[u.status]}` }, g);
       if (u.status === 'reserved') hit.style.fill = `url(#fz-hatch-${uid})`;
       mk('polygon', { class: 'facade__line', points: ptsAttr(pts), pathLength: 1 }, g);
       // značka bytu (klidový stav)
@@ -187,35 +190,35 @@
 
   /* ---------- příslušenství + rezervační tabulka ---------- */
   const pricesPublic = CFG.priceMode !== 'onRequest';
-  const range = (arr) => arr.length ? (Math.min(...arr) === Math.max(...arr) ? kc(arr[0]) : `${kc(Math.min(...arr))} – ${kc(Math.max(...arr))}`) : 'na vyžádání';
+  const range = (arr) => arr.length ? (Math.min(...arr) === Math.max(...arr) ? kc(arr[0]) : `${kc(Math.min(...arr))} – ${kc(Math.max(...arr))}`) : tr('na vyžádání');
   $$('[data-extras]').forEach((el) => {
     const P = (window.NK_PROJECTS || {})[el.dataset.extras]; if (!P || !P.pricing) return;
     const cells = pricesPublic ? P.cellars.map((c) => c.price).filter((p) => p != null) : [];
     const carea = P.cellars.map((c) => c.area);
     const prices = pricesPublic ? P.units.filter((u) => u.status === 'available').map((u) => u.price).filter((p) => p != null) : [];
-    const park = pricesPublic && P.pricing.parking.price != null ? kc(P.pricing.parking.price) : 'na vyžádání';
+    const park = pricesPublic && P.pricing.parking.price != null ? kc(P.pricing.parking.price) : tr('na vyžádání');
     el.innerHTML = `
-      <div><dt>${esc(P.pricing.parking.label)}</dt><dd>${park}<small>${P.pricing.parking.count} stání v garáži${P.parking.some((p) => p.accessible) ? ', 1 bezbariérové' : ''}</small></dd></div>
-      <div><dt>Sklep</dt><dd>${range(cells)}<small>${P.cellars.length} sklepů · ${area(Math.min(...carea))} – ${area(Math.max(...carea))}</small></dd></div>
-      <div><dt>Ceny bytů</dt><dd>${range(prices)}<small>${P.units.filter((u) => u.status === 'available').length} z ${P.units.length} bytů volných</small></dd></div>`;
+      <div><dt>${esc(tr(P.pricing.parking.label))}</dt><dd>${park}<small>${tpl('{n} stání v garáži', { n: P.pricing.parking.count })}${P.parking.some((p) => p.accessible) ? tr(', 1 bezbariérové') : ''}</small></dd></div>
+      <div><dt>${tr('Sklep')}</dt><dd>${range(cells)}<small>${tpl('{n} sklepů · {a}', { n: P.cellars.length, a: `${area(Math.min(...carea))} – ${area(Math.max(...carea))}` })}</small></dd></div>
+      <div><dt>${tr('Ceny bytů')}</dt><dd>${range(prices)}<small>${tpl('{f} z {n} bytů volných', { f: P.units.filter((u) => u.status === 'available').length, n: P.units.length })}</small></dd></div>`;
   });
   $$('[data-reservation]').forEach((el) => {
     const P = (window.NK_PROJECTS || {})[el.dataset.reservation]; if (!P || !P.reservation) return;
     const R = P.reservation;
     const withPrices = pricesPublic && P.units.some((u) => u.status === 'available' && u.price != null);
     if (withPrices) {
-      const head = R.tiers.map(([dep, disc]) => `<th scope="col">Záloha ${nf.format(dep / 1e6)} mil. Kč<small>sleva ${nf.format(disc * 100)} %</small></th>`).join('');
+      const head = R.tiers.map(([dep, disc]) => `<th scope="col">${tpl('Záloha {x} mil. Kč', { x: nf.format(dep / 1e6) })}<small>${tpl('sleva {y} %', { y: nf.format(disc * 100) })}</small></th>`).join('');
       const rows = P.units.map((u) => {
         const ok = u.status === 'available' && u.price != null;
         const cells = R.tiers.map(([dep, disc], i) => ok ? `<td${i === R.tiers.length - 1 ? ' class="is-best"' : ''}>${kc(Math.round(u.price * (1 - disc) / 1000) * 1000)}</td>` : '<td>–</td>').join('');
-        return `<tr class="st-${u.status}"><th scope="row">Byt ${esc(u.id)}</th><td>${ok ? kc(u.price) : (u.status === 'available' ? 'na vyžádání' : STATUS[u.status])}</td>${cells}</tr>`;
+        return `<tr class="st-${u.status}"><th scope="row">${tr('Byt')} ${esc(u.id)}</th><td>${ok ? kc(u.price) : (u.status === 'available' ? tr('na vyžádání') : STATUS[u.status])}</td>${cells}</tr>`;
       }).join('');
-      el.innerHTML = `<table class="reserve-table"><thead><tr><th scope="col">Byt</th><th scope="col">Cena bytu</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+      el.innerHTML = `<table class="reserve-table"><thead><tr><th scope="col">${tr('Byt')}</th><th scope="col">${tr('Cena bytu')}</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
     } else {
-      el.innerHTML = `<div class="reserve-tiers">${R.tiers.map(([dep, disc], i) => `<div class="reserve-tier${i === R.tiers.length - 1 ? ' is-best' : ''}"><small>Záloha</small><strong>${nf.format(dep / 1e6)} mil. Kč</strong><span>sleva ${nf.format(disc * 100)} % z ceny bytu</span></div>`).join('')}</div>`;
+      el.innerHTML = `<div class="reserve-tiers">${R.tiers.map(([dep, disc], i) => `<div class="reserve-tier${i === R.tiers.length - 1 ? ' is-best' : ''}"><small>${tr('Záloha')}</small><strong>${tpl('{x} mil. Kč', { x: nf.format(dep / 1e6) })}</strong><span>${tpl('sleva {y} % z ceny bytu', { y: nf.format(disc * 100) })}</span></div>`).join('')}</div>`;
     }
     const d = new Date(R.deadline);
-    $$('[data-reservation-deadline]').forEach((x) => { x.textContent = `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`; });
+    $$('[data-reservation-deadline]').forEach((x) => { x.textContent = LOC === 'cs-CZ' ? `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}` : d.toLocaleDateString(LOC, { day: 'numeric', month: 'long', year: 'numeric' }); });
   });
   $$('[data-if-prices]').forEach((e) => { e.hidden = !pricesPublic; });
   $$('[data-if-no-prices]').forEach((e) => { e.hidden = pricesPublic; });
@@ -236,15 +239,15 @@
   $$('[data-units-cards]').forEach((el) => {
     const P = (window.NK_PROJECTS || {})[el.dataset.unitsCards]; if (!P) return;
     el.innerHTML = P.units.map((u) => `<article class="ucard" data-reveal>
-      <div class="ucard__head"><span class="ucard__id">${esc(u.id)}</span><span class="tag tag--${u.status}">${u.status === 'available' ? 'Volný' : STATUS[u.status]}</span></div>
+      <div class="ucard__head"><span class="ucard__id">${esc(u.id)}</span><span class="tag tag--${u.status}">${STATUS[u.status]}</span></div>
       <dl>
-        <div><dt>Dům</dt><dd>${esc(u.house || '–')}</dd></div>
-        <div><dt>Dispozice</dt><dd>${u.disposition ? esc(u.disposition) : 'doplníme'}</dd></div>
-        <div><dt>Plocha</dt><dd>${u.area ? area(u.area) : 'doplníme'}</dd></div>
-        <div><dt>Cena</dt><dd>${u.price != null ? kc(u.price) : 'na vyžádání'}</dd></div>
+        <div><dt>${tr('Dům')}</dt><dd>${esc(u.house ? tr(u.house) : '–')}</dd></div>
+        <div><dt>${tr('Dispozice')}</dt><dd>${u.disposition ? esc(u.disposition) : tr('doplníme')}</dd></div>
+        <div><dt>${tr('Plocha')}</dt><dd>${u.area ? area(u.area) : tr('doplníme')}</dd></div>
+        <div><dt>${tr('Cena')}</dt><dd>${u.price != null ? kc(u.price) : tr('na vyžádání')}</dd></div>
       </dl>
-      <p>${esc(u.note || '')}</p>
-      <a class="btn btn--ghost" href="#kontakt"><span>Mám zájem o ${esc(u.id)}</span></a>
+      <p>${esc(u.note ? tr(u.note) : '')}</p>
+      <a class="btn btn--ghost" href="#kontakt"><span>${tpl('Mám zájem o {id}', { id: esc(u.id) })}</span></a>
     </article>`).join('');
   });
 })();

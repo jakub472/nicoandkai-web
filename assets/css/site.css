@@ -307,3 +307,14 @@ html.has-splash body { overflow: hidden; }
 .hero-media__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.3s ease; pointer-events: none; }
 .hero-media.has-video .hero-media__video.is-on { opacity: 1; }
 .hero-media.has-video .hero-media__bg img { animation: none; }
+
+/* ---------- přepínač jazyků ---------- */
+.lang { display: flex; gap: .15rem; align-items: center; margin-left: auto; }
+.lang a { font-size: .6875rem; font-weight: 800; letter-spacing: .12em; padding: .35rem .45rem; color: inherit; opacity: .55; text-decoration: none; transition: opacity .25s; }
+.lang a:hover, .lang a.is-active { opacity: 1; }
+.lang a.is-active { text-decoration: underline; text-underline-offset: .3em; text-decoration-thickness: 1px; }
+.site-header__in .lang { margin-left: 0; }
+.lang--menu { margin: 1.5rem 0 0; gap: .5rem; }
+.lang--menu a { font-size: .875rem; padding: .5rem .6rem; }
+.lang--inline { display: inline-flex; margin-left: .25rem; vertical-align: middle; }
+@media (max-width: 880px) { .site-header__in > .lang { display: none; } }

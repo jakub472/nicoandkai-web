@@ -1,0 +1,70 @@
+// Deutsches Wörterbuch für per JavaScript gerenderte Texte (Daten + UI). Schlüssel sind die tschechischen Originale.
+window.NK_LANG = 'de';
+window.NK_LOCALE = 'de-DE';
+window.NK_DICT = {
+  'Volný': 'Frei', 'Rezervovaný': 'Reserviert', 'Prodaný': 'Verkauft',
+  'Kč': 'CZK', 'Cena na vyžádání': 'Preis auf Anfrage', 'na vyžádání': 'auf Anfrage',
+  'Byt': 'Wohnung', 'Zobrazit': 'Anzeigen', 'Detail →': 'Details →',
+  '1. NP': 'EG', '2. NP': '1. OG', '3. NP': '2. OG', '1. PP': 'UG', '2. PP': '2. UG',
+  '1. nadzemní podlaží': 'Erdgeschoss', '2. nadzemní podlaží': '1. Obergeschoss', '3. nadzemní podlaží': '2. Obergeschoss',
+  '1. podzemní podlaží (garáž a sklepy)': 'Untergeschoss (Garage und Keller)', '1. podzemní podlaží (garáž)': 'Untergeschoss (Garage)',
+  '2. podzemní podlaží (sklepy a technika)': '2. Untergeschoss (Keller und Technik)',
+  '16 stání · 8 sklepů': '16 Stellplätze · 8 Keller', '7 garážových stání': '7 Garagenstellplätze', '6 sklepů': '6 Keller',
+  'Garáž a sklepy': 'Garage und Keller', 'Garáž': 'Garage', 'Sklepy a technika': 'Keller und Technik',
+  'Garážová stání': 'Garagenstellplätze', 'Sklepy': 'Keller', 'Plocha sklepů': 'Kellerflächen', 'Plocha garáže': 'Garagenfläche',
+  'Garáž je propojená výtahem se všemi podlažími. Stání č.&nbsp;6 je vyhrazené pro osoby s omezenou schopností pohybu. Garážové stání i sklep lze k bytu přikoupit samostatně.':
+    'Die Garage ist per Aufzug mit allen Geschossen verbunden. Stellplatz Nr.&nbsp;6 ist für Personen mit eingeschränkter Mobilität reserviert. Garagenstellplatz und Keller können zu jeder Wohnung separat hinzugekauft werden.',
+  'Garáž v 1. podzemním podlaží se sjezdem z ulice Do čtvrti. Výtah propojuje garáž i všechna podlaží domu.':
+    'Garage im 1. Untergeschoss mit Einfahrt von der Straße Do čtvrti. Der Aufzug verbindet die Garage mit allen Geschossen des Hauses.',
+  'Sklepní kóje a technické zázemí domu ve 2. podzemním podlaží. Výtah sem sjíždí z&nbsp;celého domu.':
+    'Kellerabteile und Haustechnik im 2. Untergeschoss. Der Aufzug fährt aus dem ganzen Haus bis hierher.',
+  'Cena stání a sklepů': 'Preis für Stellplätze und Keller', 'Cena stání': 'Stellplatzpreis', 'Cena sklepů': 'Kellerpreis',
+  'Mám zájem o stání / sklep': 'Interesse an Stellplatz / Keller', 'Mám zájem o stání': 'Interesse an einem Stellplatz', 'Mám zájem o sklep': 'Interesse an einem Keller',
+  'Rezervovat byt': 'Wohnung reservieren', 'Mám zájem o byt': 'Interesse an Wohnung',
+  'Ke každému bytu lze přikoupit garážové stání a sklep.': 'Zu jeder Wohnung können Garagenstellplatz und Keller hinzugekauft werden.',
+  'Půdorys z dokumentace pro povolení stavby (12/2025). Plochy dle projektu, závazné jsou údaje z prohlášení vlastníka.':
+    'Grundriss aus der Baugenehmigungsplanung (12/2025). Flächen laut Projekt; verbindlich sind die Angaben der Teilungserklärung.',
+  'Půdorys z projektové dokumentace (08/2026). Plochy dle projektu, závazné jsou údaje z kolaudace.':
+    'Grundriss aus der Projektplanung (08/2026). Flächen laut Projekt; verbindlich sind die Angaben nach der Abnahme.',
+  'Garážové stání': 'Garagenstellplatz',
+  'Terasa': 'Terrasse', 'Balkon': 'Balkon', 'Zahrada': 'Garten', 'střešní terasa': 'Dachterrasse', 'balkon': 'Balkon', 'soukromá zahrada': 'privater Garten',
+  'dvě střešní terasy (81,3 + 22,9 m²)': 'zwei Dachterrassen (81,3 + 22,9 m²)', 'terasa': 'Terrasse', 'terasa se zahradou': 'Terrasse mit Garten',
+  'Zahrada / balkon / terasa': 'Garten / Balkon / Terrasse',
+  'Zádveří': 'Windfang', 'Chodba': 'Flur', 'Vstup': 'Eingang', 'Koupelna + WC': 'Bad + WC', 'Koupelna': 'Bad', 'WC': 'WC',
+  'Kuchyně': 'Küche', 'Ložnice': 'Schlafzimmer', 'Obývací pokoj + kuchyň': 'Wohnzimmer + Küche', 'Obývací pokoj': 'Wohnzimmer',
+  'Obývací část': 'Wohnbereich', 'Pokoj': 'Zimmer', 'Prádelna': 'Hauswirtschaftsraum', 'Šatna': 'Ankleide',
+  'Dům A': 'Haus A', 'Dům B': 'Haus B', 'Dispozici a plochu doplníme.': 'Grundriss und Fläche folgen.',
+  'Prostorný apartmán přes dvě podlaží s vlastní terasou.': 'Großzügiges Apartment über zwei Etagen mit eigener Terrasse.',
+  'Půdorys – {f}': 'Grundriss – {f}', 'Půdorys z projektové dokumentace.': 'Grundriss aus der Projektplanung.',
+  'Půdorys tohoto podlaží doplníme.': 'Der Grundriss dieses Geschosses folgt.',
+  'byt': 'Wohnung', 'byty': 'Wohnungen', 'bytů': 'Wohnungen', 'volné': 'frei',
+  'Vyberte byt v&nbsp;půdorysu nebo v&nbsp;přehledu níže.': 'Wählen Sie eine Wohnung im Grundriss oder in der Übersicht unten.',
+  'Dispozice': 'Grundriss', 'Podlaží': 'Geschoss', 'Plocha dle NV 366/2013': 'Wohnfläche (VO 366/2013)', 'Součet místností': 'Summe der Räume',
+  'Venkovní prostor': 'Außenbereich', 'Celkem včetně venkovního prostoru': 'Gesamt inkl. Außenbereich', 'Vyžádat ceník': 'Preisliste anfordern',
+  'Místnosti': 'Räume', 'Celé podlaží': 'Ganzes Geschoss',
+  'Tento byt už není k&nbsp;dispozici. Napište nám a dáme vám vědět o&nbsp;podobných bytech.': 'Diese Wohnung ist nicht mehr verfügbar. Schreiben Sie uns, wir informieren Sie über ähnliche Wohnungen.',
+  'Napsat nám': 'Schreiben Sie uns',
+  'Při rezervaci se zálohou {dep} mil. Kč v&nbsp;průběhu stavebního řízení: sleva {disc} %, cena <strong>{price}</strong>. <a href="#rezervace">Podmínky rezervace</a>':
+    'Bei Reservierung mit einer Anzahlung von {dep} Mio. CZK während des Genehmigungsverfahrens: {disc} % Rabatt, Preis <strong>{price}</strong>. <a href="#rezervace">Reservierungsbedingungen</a>',
+  'Plocha (NV 366/2013)': 'Fläche (VO 366/2013)', 'Zobrazit byt {id}': 'Wohnung {id} anzeigen',
+  'Zatím nevím / obecný dotaz': 'Noch unklar / allgemeine Anfrage', 'Půdorys {f} z projektové dokumentace': 'Grundriss {f} aus der Projektplanung',
+  'Plocha bytu je podlahová plocha podle nařízení vlády č. 366/2013 Sb. (včetně příček), orientační odhad z půdorysů. Závazná plocha bude v prohlášení vlastníka. Součet místností je v detailu bytu. Sklepy nejsou součástí plochy bytu.':
+    'Die Wohnfläche ist die Bodenfläche gemäß tschechischer Regierungsverordnung Nr. 366/2013 Slg. (inkl. Trennwände), ein Richtwert aus den Grundrissen. Die verbindliche Fläche steht in der Teilungserklärung. Die Summe der Räume finden Sie im Wohnungsdetail. Keller sind nicht enthalten.',
+  'Plochy jsou součtem místností podle projektové dokumentace. Podlahová plocha podle nařízení vlády č. 366/2013 Sb. (včetně příček a konstrukcí uvnitř bytu) bude o několik procent větší. Doplníme ji po výpočtu architekta.':
+    'Die Flächen sind die Summe der Räume laut Projektplanung. Die Bodenfläche gemäß Regierungsverordnung Nr. 366/2013 Slg. (inkl. Trennwände in der Wohnung) wird einige Prozent größer sein und nach der Berechnung des Architekten ergänzt.',
+  'Kliknutím otevřete detail a půdorys': 'Klicken für Detail und Grundriss',
+  '{n} stání v garáži': '{n} Stellplätze in der Garage', ', 1 bezbariérové': ', 1 barrierefrei', 'Sklep': 'Keller', '{n} sklepů · {a}': '{n} Keller · {a}',
+  'Ceny bytů': 'Wohnungspreise', '{f} z {n} bytů volných': '{f} von {n} Wohnungen frei',
+  'Záloha {x} mil. Kč': 'Anzahlung {x} Mio. CZK', 'sleva {y} %': '{y} % Rabatt', 'Cena bytu': 'Wohnungspreis',
+  'Záloha': 'Anzahlung', '{x} mil. Kč': '{x} Mio. CZK', 'sleva {y} % z ceny bytu': '{y} % Rabatt auf den Wohnungspreis',
+  'Předchozí': 'Zurück', 'Další': 'Weiter', 'Zavřít ✕': 'Schließen ✕',
+  'Dům': 'Haus', 'Plocha': 'Fläche', 'Cena': 'Preis', 'doplníme': 'folgt', 'Mám zájem o {id}': 'Interesse an {id}',
+  'Zavřít': 'Schließen', 'Menu': 'Menü',
+  'Napište prosím své jméno.': 'Bitte geben Sie Ihren Namen ein.', 'Zadejte prosím platný e-mail.': 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+  'Pro odeslání potvrďte prosím souhlas.': 'Bitte bestätigen Sie vor dem Senden die Einwilligung.',
+  'Děkujeme, vaše žádost byla odeslána. Brzy se vám ozveme.': 'Vielen Dank, Ihre Anfrage wurde gesendet. Wir melden uns in Kürze.',
+  'Odeslání se nezdařilo. Zkuste to prosím znovu.': 'Senden fehlgeschlagen. Bitte versuchen Sie es erneut.',
+  'Otevíráme váš e-mailový program…': 'Ihr E-Mail-Programm wird geöffnet…', 'Formulář zatím není napojen na příjem zpráv.': 'Das Formular ist noch nicht angebunden.',
+  'Projekt:': 'Projekt:', 'Byt:': 'Wohnung:', 'Zájem o garážové stání: ano': 'Interesse an Garagenstellplatz: ja', 'Zájem o sklep: ano': 'Interesse an Keller: ja',
+  'Jméno:': 'Name:', 'E-mail:': 'E-Mail:', 'Telefon:': 'Telefon:', 'Zájem: {project}': 'Anfrage: {project}', ' – byt ': ' – Wohnung ',
+};

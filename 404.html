@@ -12,7 +12,9 @@
     svg{margin-bottom:2.5rem}
     h1{font-size:clamp(2.2rem,7vw,4.5rem);font-weight:800;letter-spacing:-.04em;line-height:.95;margin:0 0 1rem}
     h1 span{display:block;font-weight:300}
-    p{color:#bdbdb8;font-size:1.05rem;line-height:1.55;margin:0 0 2rem}
+    p{color:#bdbdb8;font-size:1.05rem;line-height:1.55;margin:0 0 .5rem}
+    p.alt{font-size:.9rem;color:#8a8a85}
+    nav{margin-top:2rem}
     a{display:inline-block;color:#000;background:#fff;text-decoration:none;font-weight:800;padding:.95rem 1.6rem;letter-spacing:-.01em}
     a+a{background:transparent;color:#fff;border:1px solid #fff;margin-left:.5rem}
   </style>
@@ -28,10 +30,12 @@
 </g></svg>
     <h1>Tady nic nestojí.<span>Zatím.</span></h1>
     <p>Stránka, kterou hledáte, neexistuje nebo se přestěhovala.</p>
+    <p class="alt" lang="en">Nothing built here. Yet. The page you are looking for does not exist or has moved.</p>
+    <p class="alt" lang="de">Hier steht nichts. Noch nicht. Die gesuchte Seite existiert nicht oder ist umgezogen.</p>
     <nav><a id="home" href="/">Úvodní stránka</a><a id="ks" href="/ke-schodum/">Rezidence ke Schodům</a></nav>
   </main>
   <script>
-    (function(){var r=location.pathname.indexOf('/nicoandkai-web/')===0?'/nicoandkai-web/':'/';document.getElementById('home').href=r;document.getElementById('ks').href=r+'ke-schodum/';
+    (function(){var r=location.pathname.indexOf('/nicoandkai-web/')===0?'/nicoandkai-web/':'/';var l=/^\/(nicoandkai-web\/)?(en|de)\//.exec(location.pathname);var h=r+(l?l[2]+'/':'');document.getElementById('home').href=h;document.getElementById('ks').href=h+'ke-schodum/';
     var s=document.createElement('style');s.textContent='@font-face{font-family:Manrope;src:url('+r+'assets/fonts/Manrope-Variable.woff2) format("woff2");font-weight:200 800;font-display:swap}';document.head.appendChild(s);})();
   </script>
 </body>

@@ -1,11 +1,34 @@
 # -*- coding: utf-8 -*-
-"""Generátor stránek webu Nico & Kai Development. Spuštění: python3 tools/build-pages.py
-Zapisuje index.html, ke-schodum/index.html, do-ctvrti/index.html, apartmany-vysoke/index.html, rezidence-vlnita/index.html."""
-import os, re
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE_URL = "https://nicoandkai.com"   # ostrá doména (canonical, og:url, sitemap)
-PATHS = {"home": "", "ke-schodum": "ke-schodum/", "do-ctvrti": "do-ctvrti/", "vysoke": "apartmany-vysoke/", "vlnita": "rezidence-vlnita/", "gdpr": "ochrana-osobnich-udaju/"}
+"""Generátor stránek webu Nico & Kai Development ve třech jazycích. Spuštění: python3 tools/build-pages.py
+Texty: tools/i18n.py. Výstup: index.html + en/ + de/ (úvod, 4 projekty, ochrana osobních údajů), 404.html, sitemap.xml, robots.txt."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from i18n import LANGS, LANG_META, UI, PROJECTS, HOME, VYSOKE, VLNITA, LEGAL, NOTFOUND
 
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SITE_URL = "https://nicoandkai.com"   # ostrá doména (canonical, hreflang, og:url, sitemap)
+PAGES = ["home", "ke-schodum", "do-ctvrti", "vysoke", "vlnita", "privacy"]
+
+def page_path(lang, key):
+    """Cesta stránky od kořene jazyka (bez prefixu jazyka)."""
+    return {"home": "", "ke-schodum": "ke-schodum/", "do-ctvrti": "do-ctvrti/", "vysoke": "apartmany-vysoke/", "vlnita": "rezidence-vlnita/",
+            "privacy": LANG_META[lang]["privacy"] + "/"}[key]
+
+class Ctx:
+    """Kontext jazyka a hloubky stránky: rel = cesta ke kořeni webu (assets), home = cesta ke kořeni jazyka."""
+    def __init__(self, lang, key):
+        self.lang, self.key = lang, key
+        self.T = UI[lang]
+        self.prefix = LANG_META[lang]["prefix"]
+        depth = (1 if self.prefix else 0) + (1 if page_path(lang, key) else 0)
+        self.rel = "../" * depth
+        self.home = self.rel + self.prefix
+        self.privacy = self.home + LANG_META[lang]["privacy"] + "/"
+    def alt(self, lang):
+        """Relativní odkaz na tutéž stránku v jiném jazyce."""
+        return self.rel + LANG_META[lang]["prefix"] + page_path(lang, self.key) or "./"
+
+# ---------------------------------------------------------------------- obrázky
 def img(path, alt, widths=(600, 1200, 2400), sizes="100vw", cls="", lazy=True, extra=""):
     base = path.rsplit(".", 1)[0]
     srcset = ", ".join(f"{base}-{w}.webp {w}w" for w in widths)
@@ -23,9 +46,14 @@ def fig(path, alt, cap="", kind="", widths=(600, 1200, 2400)):
     sizes = "(max-width: 880px) 100vw, 66vw" if kind in ("is-wide", "is-big") else "(max-width: 880px) 100vw, 33vw"
     return f'<figure{(" class=\"" + kind + "\"") if kind else ""}>{img(path, alt, widths, sizes)}{("<figcaption>" + cap + "</figcaption>") if cap else ""}</figure>'
 
-def head(title, desc, og, rel, canonical_slug, theme="#000000", extra_css="", extra_head=""):
+# ---------------------------------------------------------------------- společné bloky
+def head(C, title, desc, og, theme="#000000", extra_css="", extra_head=""):
+    rel = C.rel
+    url = f"{SITE_URL}/{C.prefix}{page_path(C.lang, C.key)}"
+    alts = "\n".join(f'  <link rel="alternate" hreflang="{l}" href="{SITE_URL}/{LANG_META[l]["prefix"]}{page_path(l, C.key)}">' for l in LANGS)
+    alts += f'\n  <link rel="alternate" hreflang="x-default" href="{SITE_URL}/{page_path("cs", C.key)}">'
     return f"""<!doctype html>
-<html lang="cs">
+<html lang="{C.lang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -34,13 +62,14 @@ def head(title, desc, og, rel, canonical_slug, theme="#000000", extra_css="", ex
   <meta name="theme-color" content="{theme}">
   <meta name="color-scheme" content="light">
   <meta property="og:type" content="website">
-  <meta property="og:locale" content="cs_CZ">
+  <meta property="og:locale" content="{LANG_META[C.lang]['locale']}">
   <meta property="og:site_name" content="Nico &amp; Kai Development">
   <meta property="og:title" content="{title}">
   <meta property="og:description" content="{desc}">
   <meta property="og:image" content="{SITE_URL}/assets/img/{og}">
-  <meta property="og:url" content="{SITE_URL}/{PATHS.get(canonical_slug, "")}">
-  <link rel="canonical" href="{SITE_URL}/{PATHS.get(canonical_slug, "")}">
+  <meta property="og:url" content="{url}">
+  <link rel="canonical" href="{url}">
+{alts}
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="{rel}assets/img/icons/favicon.ico" sizes="48x48">
   <link rel="icon" href="{rel}assets/img/logo/nk-ikona-cerna.svg" type="image/svg+xml">
@@ -52,97 +81,108 @@ def head(title, desc, og, rel, canonical_slug, theme="#000000", extra_css="", ex
   <script>document.documentElement.classList.add('js')</script>{extra_head}
 </head>
 <body>
-  <a class="skip" href="#obsah">Přeskočit na obsah</a>
+  <a class="skip" href="#obsah">{C.T['skip']}</a>
   <div class="progress" aria-hidden="true"></div>
 """
 
-def header(rel, nav, cta_href, cta_label, menu=None):
+def lang_switch(C, cls="lang"):
+    links = "".join(f'<a href="{C.alt(l)}" hreflang="{l}" lang="{l}"{" class=\"is-active\" aria-current=\"page\"" if l == C.lang else ""}>{LANG_META[l]["short"]}</a>' for l in LANGS)
+    return f'<nav class="{cls}" aria-label="{C.T["lang_aria"]}">{links}</nav>'
+
+def header(C, nav, cta_href, cta_label, menu=None):
+    T, rel = C.T, C.rel
     menu = menu or nav
     navh = "\n".join(f'        <a href="{h}" data-nav="{h.lstrip("#").split("/")[0] or "home"}">{t}</a>' for h, t in nav)
     menuh = "\n".join(f'      <a href="{h}"><small>{i+1:02d}</small>{t}</a>' for i, (h, t) in enumerate(menu))
     return f"""  <header class="site-header" id="header">
     <div class="wrap site-header__in">
-      <a class="brand" href="{rel or './'}" aria-label="Nico &amp; Kai Development – úvodní stránka">
+      <a class="brand" href="{C.home or './'}" aria-label="{T['brand_aria']}">
         <img class="brand__light" src="{rel}assets/img/logo/nk-logo-horizontalni-cerne.svg" alt="Nico &amp; Kai Development" width="168" height="30">
         <img class="brand__dark" src="{rel}assets/img/logo/nk-logo-horizontalni-bile.svg" alt="" width="168" height="30" aria-hidden="true">
       </a>
-      <nav class="nav" aria-label="Hlavní navigace">
+      <nav class="nav" aria-label="{T['nav_main']}">
 {navh}
       </nav>
+      {lang_switch(C)}
       <a class="btn btn--sm header-cta" href="{cta_href}"><span>{cta_label}</span></a>
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
-        <span class="menu-btn__label">Menu</span>
+        <span class="menu-btn__label">{T['menu']}</span>
         <span class="menu-btn__icon" aria-hidden="true"><i></i><i></i></span>
       </button>
     </div>
   </header>
 
   <div class="menu" id="menu" hidden>
-    <nav class="wrap menu__nav" aria-label="Mobilní navigace">
+    <nav class="wrap menu__nav" aria-label="{T['nav_mobile']}">
 {menuh}
     </nav>
+    <div class="wrap">{lang_switch(C, "lang lang--menu")}</div>
   </div>
 
   <main id="obsah">
 """
 
-def footer(rel, legal_prefix="company", extra_note=""):
+def footer(C, legal_prefix="company", extra_note=""):
+    T, rel = C.T, C.rel
     return f"""  </main>
 
   <footer class="footer dark">
     <div class="wrap">
       <div class="footer__top">
-        <a class="brand" href="{rel or './'}" aria-label="Nico &amp; Kai Development – úvodní stránka">
+        <a class="brand" href="{C.home or './'}" aria-label="{T['brand_aria']}">
           <img src="{rel}assets/img/logo/nk-logo-horizontalni-bile.svg" alt="Nico &amp; Kai Development" width="168" height="30">
         </a>
-        <nav class="footer__nav" aria-label="Patička">
-          <a href="{rel}ke-schodum/">Rezidence ke Schodům</a>
-          <a href="{rel}do-ctvrti/">Rezidence Do Čtvrti</a>
-          <a href="{rel}apartmany-vysoke/">Apartmány Vysoké</a>
-          <a href="{rel}rezidence-vlnita/">Rezidence Vlnitá</a>
-          <a href="{rel}ochrana-osobnich-udaju/">Ochrana osobních údajů</a>
+        <nav class="footer__nav" aria-label="{T['nav_footer']}">
+          <a href="{C.home}ke-schodum/">{T['ks']}</a>
+          <a href="{C.home}do-ctvrti/">{T['dc']}</a>
+          <a href="{C.home}apartmany-vysoke/">{T['vy']}</a>
+          <a href="{C.home}rezidence-vlnita/">{T['vl']}</a>
+          <a href="{C.privacy}">{T['privacy']}</a>
         </nav>
       </div>
 
       <div class="partners">
-        <div class="partners__item"><small>Architektura</small><img src="{rel}assets/img/partners/ja-architekti.svg" alt="JA Architekti" style="height:1.6rem;width:auto;filter:invert(1)"></div>
+        <div class="partners__item"><small>{T['partners_arch']}</small><img src="{rel}assets/img/partners/ja-architekti.svg" alt="JA Architekti" style="height:1.6rem;width:auto;filter:invert(1)"></div>
       </div>
 
       <ul class="legal-list" data-cfg-group>
-        <li data-cfg-wrap="{legal_prefix}.legalName"><span>Společnost</span><span data-cfg="{legal_prefix}.legalName"></span></li>
-        <li data-cfg-wrap="{legal_prefix}.ico"><span>IČO</span><span data-cfg="{legal_prefix}.ico"></span></li>
-        <li data-cfg-wrap="{legal_prefix}.dic"><span>DIČ</span><span data-cfg="{legal_prefix}.dic"></span></li>
-        <li data-cfg-wrap="{legal_prefix}.address"><span>Sídlo</span><span data-cfg="{legal_prefix}.address"></span></li>
-        <li data-cfg-wrap="company.email"><span>E-mail</span><a data-cfg="company.email" data-cfg-href="mailto:"></a></li>
-        <li data-cfg-wrap="company.phone"><span>Telefon</span><a data-cfg="company.phone" data-cfg-href="tel:"></a></li>
+        <li data-cfg-wrap="{legal_prefix}.legalName"><span>{T['legal_company']}</span><span data-cfg="{legal_prefix}.legalName"></span></li>
+        <li data-cfg-wrap="{legal_prefix}.ico"><span>{T['legal_ico']}</span><span data-cfg="{legal_prefix}.ico"></span></li>
+        <li data-cfg-wrap="{legal_prefix}.dic"><span>{T['legal_dic']}</span><span data-cfg="{legal_prefix}.dic"></span></li>
+        <li data-cfg-wrap="{legal_prefix}.address"><span>{T['legal_addr']}</span><span data-cfg="{legal_prefix}.address"></span></li>
+        <li data-cfg-wrap="company.email"><span>{T['legal_email']}</span><a data-cfg="company.email" data-cfg-href="mailto:"></a></li>
+        <li data-cfg-wrap="company.phone"><span>{T['legal_phone']}</span><a data-cfg="company.phone" data-cfg-href="tel:"></a></li>
       </ul>
 
       <p class="footer__note">
-        Informace na&nbsp;tomto webu mají informativní charakter a&nbsp;nejsou návrhem na&nbsp;uzavření smlouvy ve&nbsp;smyslu § 1732 občanského zákoníku. Vizualizace jsou ilustrativní, plochy jsou uvedeny dle projektové dokumentace a&nbsp;mohou se změnit.{extra_note}
+        {T['footer_note']}{extra_note}
       </p>
-      <p class="footer__copy">© <span data-year>2026</span> Nico &amp; Kai Development</p>
+      <p class="footer__copy">© <span data-year>2026</span> Nico &amp; Kai Development · {lang_switch(C, "lang lang--inline")}</p>
     </div>
     <img class="footer__mark" src="{rel}assets/img/logo/nk-monogram-bile.svg" alt="" aria-hidden="true">
   </footer>
 """
 
-def scripts(rel, data=(), explorer=False):
+def scripts(C, data=(), explorer=False):
+    rel = C.rel
     s = f'  <script src="{rel}assets/js/config.js"></script>\n'
+    if C.lang != "cs": s += f'  <script src="{rel}assets/i18n/{C.lang}.js"></script>\n'
     for d in data: s += f'  <script src="{rel}assets/data/{d}.js"></script>\n'
     s += f'  <script src="{rel}assets/js/main.js"></script>\n'
     if explorer: s += f'  <script src="{rel}assets/js/explorer.js"></script>\n'
     s += f'  <script src="{rel}assets/js/site.js"></script>\n  <script src="{rel}assets/js/atmo.js" defer></script>\n</body>\n</html>\n'
     return s
 
-def form(project, with_unit=True, extras=True, title=("Zarezervujte si", "svůj byt."), lead="", how=(), submit="Odeslat žádost o rezervaci", eyebrow=("05", "Rezervace"), rel="../"):
-    unit = """            <div class="field field--select">
-              <span>Byt</span>
-              <select name="unit" aria-label="Byt"><option value="">Zatím nevím / obecný dotaz</option></select>
+def form(C, project, with_unit=True, extras=True, title=("", ""), lead="", how=(), submit="", eyebrow=("05", "")):
+    T = C.T
+    unit = f"""            <div class="field field--select">
+              <span>{T['f_unit']}</span>
+              <select name="unit" aria-label="{T['f_unit']}"><option value="">{T['f_unit_default']}</option></select>
             </div>
 """ if with_unit else ""
-    ex = """            <div class="extras">
-              <label class="check"><input type="checkbox" name="parking"><span class="check__box" aria-hidden="true"></span><span class="check__text">Mám zájem o garážové stání</span></label>
-              <label class="check"><input type="checkbox" name="cellar"><span class="check__box" aria-hidden="true"></span><span class="check__text">Mám zájem o sklep</span></label>
+    ex = f"""            <div class="extras">
+              <label class="check"><input type="checkbox" name="parking"><span class="check__box" aria-hidden="true"></span><span class="check__text">{T['f_parking']}</span></label>
+              <label class="check"><input type="checkbox" name="cellar"><span class="check__box" aria-hidden="true"></span><span class="check__text">{T['f_cellar']}</span></label>
             </div>
 """ if extras else ""
     howh = ("<ol class=\"how\" data-reveal>" + "".join(f"<li>{h}</li>" for h in how) + "</ol>") if how else ""
@@ -158,20 +198,20 @@ def form(project, with_unit=True, extras=True, title=("Zarezervujte si", "svůj 
             <p class="lead" data-reveal>{lead}</p>
             {howh}
             <ul class="contact-list" data-reveal>
-              <li data-cfg-wrap="company.email"><span>E-mail</span><a data-cfg="company.email" data-cfg-href="mailto:"></a></li>
-              <li data-cfg-wrap="company.phone"><span>Telefon</span><a data-cfg="company.phone" data-cfg-href="tel:"></a></li>
+              <li data-cfg-wrap="company.email"><span>{T['legal_email']}</span><a data-cfg="company.email" data-cfg-href="mailto:"></a></li>
+              <li data-cfg-wrap="company.phone"><span>{T['legal_phone']}</span><a data-cfg="company.phone" data-cfg-href="tel:"></a></li>
             </ul>
           </div>
           <form class="form js-lead-form" id="contact-form" data-project="{project}" novalidate data-reveal>
-{unit}{ex}            <div class="field"><input id="f-name" name="name" type="text" autocomplete="name" placeholder=" " required><label for="f-name">Jméno a&nbsp;příjmení</label></div>
-            <div class="field"><input id="f-email" name="email" type="email" autocomplete="email" placeholder=" " required><label for="f-email">E-mail</label></div>
-            <div class="field"><input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder=" "><label for="f-phone">Telefon <span>(volitelné)</span></label></div>
-            <div class="field"><textarea id="f-msg" name="message" rows="3" placeholder=" "></textarea><label for="f-msg">Zpráva <span>(volitelné)</span></label></div>
-            <div class="hp" aria-hidden="true"><label>Nevyplňujte <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+{unit}{ex}            <div class="field"><input id="f-name" name="name" type="text" autocomplete="name" placeholder=" " required><label for="f-name">{T['f_name']}</label></div>
+            <div class="field"><input id="f-email" name="email" type="email" autocomplete="email" placeholder=" " required><label for="f-email">{T['f_email']}</label></div>
+            <div class="field"><input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder=" "><label for="f-phone">{T['f_phone']} <span>{T['f_optional']}</span></label></div>
+            <div class="field"><textarea id="f-msg" name="message" rows="3" placeholder=" "></textarea><label for="f-msg">{T['f_msg']} <span>{T['f_optional']}</span></label></div>
+            <div class="hp" aria-hidden="true"><label>{T['f_hp']} <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
             <label class="check">
               <input type="checkbox" name="consent" required>
               <span class="check__box" aria-hidden="true"></span>
-              <span class="check__text">Souhlasím se <a href="{rel}ochrana-osobnich-udaju/" target="_blank" rel="noopener">zpracováním osobních údajů</a> za&nbsp;účelem odpovědi na&nbsp;můj dotaz a&nbsp;zasílání informací o&nbsp;projektu.</span>
+              <span class="check__text">{T['f_consent_a']} <a href="{C.privacy}" target="_blank" rel="noopener">{T['f_consent_link']}</a> {T['f_consent_b']}</span>
             </label>
             <div class="form__actions">
               <button class="btn" type="submit"><span>{submit}</span><i class="arrow" aria-hidden="true">→</i></button>
@@ -183,17 +223,19 @@ def form(project, with_unit=True, extras=True, title=("Zarezervujte si", "svůj 
     </section>
 """
 
-def explorer_block(slug, plan_note, cad_note):
+def explorer_block(C, plan_note, cad_note):
+    T = C.T
+    ths = "".join(f'<th scope="col">{h}</th>' for h in T['th'][:-1]) + f'<th scope="col"><span class="sr-only">{T["th"][-1]}</span></th>'
     return f"""        <div class="ex" data-reveal>
           <div class="ex__stack">
-            <svg id="ex-stack" role="group" aria-label="Dům po podlažích – vyberte patro"></svg>
-            <ul class="ex__floors" id="ex-floors" role="tablist" aria-label="Podlaží"></ul>
+            <svg id="ex-stack" role="group" aria-label="{T['ex_stack_aria']}"></svg>
+            <ul class="ex__floors" id="ex-floors" role="tablist" aria-label="{T['ex_floors_aria']}"></ul>
           </div>
           <div class="ex__main">
             <div class="ex__plan">
               <div class="ex__planhead">
-                <h3 id="ex-floor-title">Podlaží</h3>
-                <button class="link" type="button" id="ex-cad">Půdorys z&nbsp;projektu ↗</button>
+                <h3 id="ex-floor-title">{T['ex_floor']}</h3>
+                <button class="link" type="button" id="ex-cad">{T['ex_cad']}</button>
               </div>
               <div class="ex__planbox"><svg id="ex-plan" role="group"></svg></div>
               <p class="ex__note" id="ex-note">{plan_note}</p>
@@ -203,9 +245,9 @@ def explorer_block(slug, plan_note, cad_note):
         </div>
 
         <div class="units-wrap" data-reveal>
-          <h3>Přehled bytů</h3>
+          <h3>{T['ex_overview']}</h3>
           <table id="ex-table">
-            <thead><tr><th scope="col">Byt</th><th scope="col">Podlaží</th><th scope="col">Dispozice</th><th scope="col">Plocha</th><th scope="col">Terasa</th><th scope="col">Celkem</th><th scope="col">Cena</th><th scope="col">Stav</th><th scope="col"><span class="sr-only">Detail</span></th></tr></thead>
+            <thead><tr>{ths}</tr></thead>
             <tbody></tbody>
           </table>
           <p class="units-note" id="ex-areanote"></p>
@@ -213,8 +255,8 @@ def explorer_block(slug, plan_note, cad_note):
 
         <dialog class="dialog" id="ex-dialog" aria-labelledby="ex-dialog-title">
           <div class="dialog__bar">
-            <strong class="dialog__title" id="ex-dialog-title">Půdorys</strong>
-            <button class="link" type="button" data-dialog-close>Zavřít ✕</button>
+            <strong class="dialog__title" id="ex-dialog-title">{T['ex_dialog']}</strong>
+            <button class="link" type="button" data-dialog-close>{T['close']}</button>
           </div>
           <div class="dialog__body"><img alt="" src=""></div>
           <p class="dialog__note">{cad_note}</p>
@@ -224,9 +266,9 @@ def explorer_block(slug, plan_note, cad_note):
 # ======================================================================
 # PROJEKTOVÉ STRÁNKY (Ke Schodům, Do Čtvrti)
 # ======================================================================
-def project_page(c):
-    rel = "../"; I = lambda n: f"{rel}assets/img/{c['slug']}/{n}.webp"
-    nav = [("#dum", "Dům"), ("#galerie", "Galerie"), ("#byty", "Byty"), ("#cenik", "Ceník"), ("#rezervace", "Rezervace")]
+def project_page(C, c):
+    T, rel = C.T, C.rel; I = lambda n: f"{rel}assets/img/{c['slug']}/{n}.webp"
+    nav = [("#dum", T['p_dum']), ("#galerie", T['p_galerie']), ("#byty", T['p_byty']), ("#cenik", T['p_cenik']), ("#rezervace", T['p_rezervace'])]
     gal = "".join(fig(I(n), a, cap, k) for n, a, cap, k in c["gallery"])
     splits = ""
     for i, (n, a, h3, txt) in enumerate(c["splits"]):
@@ -239,42 +281,44 @@ def project_page(c):
     tech = "".join(f'<article class="tech__col" data-reveal style="--d:.{i}s"><h3>{h}</h3><ul>{"".join(f"<li>{x}</li>" for x in items)}</ul></article>' for i, (h, items) in enumerate(c["tech"]))
     steps = "".join(f'<li{" class=\"is-now\"" if now else ""} data-reveal style="--d:.{i}s"><small>{s}</small><strong>{t}</strong><p>{d}</p></li>' for i, (s, t, d, now) in enumerate(c["steps"]))
     addr = "".join(f"<div><span>{k}</span><strong>{v}</strong></div>" for k, v in c["addr"])
-    html = head(c["title"], c["desc"], c["og"], rel, c["slug"], extra_head=f"""
+    numbers = "".join(f'<div data-reveal style="--d:.{i}s"><strong><span data-count="{n}">{n}</span>{("<small>" + u + "</small>") if u else ""}</strong><span>{l}</span></div>' for i, ((n, u), l) in enumerate(zip(c['numbers_n'], c['numbers_l'])))
+    terms = "".join(f"<li><strong>{a}</strong><p>{b}</p></li>" for a, b in T['terms'])
+    html = head(C, c["title"], c["desc"], c["og"], extra_head=f"""
   <script type="application/ld+json">
   {{"@context": "https://schema.org", "@type": "ApartmentComplex", "name": "{c['name']}", "description": "{c['desc']}",
    "numberOfAccommodationUnits": {c['units']}, "address": {{"@type": "PostalAddress", "streetAddress": "{c['street']}", "addressLocality": "Praha", "postalCode": "143 00", "addressCountry": "CZ"}}}}
   </script>""")
-    html += header(rel, nav, "#byty", "Vybrat byt", nav + [(rel, "Všechny projekty")])
+    html += header(C, nav, "#byty", T['choose_unit'], nav + [(C.home or "./", T['all_projects'])])
     html += f"""
     <!-- ============ HERO ============ -->
     <section class="hero-media dark" id="top" data-atmo="mist">
       <div class="hero-media__bg">{img(I(c['hero']), c['hero_alt'], sizes="100vw", lazy=False)}{video(rel, c['video']) if c.get('video') else ''}</div>
       <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
-        <p class="chip" data-reveal><i aria-hidden="true"></i>{c['stage']} · stavební řízení zahájeno</p>
+        <p class="chip" data-reveal><i aria-hidden="true"></i>{c['stage']} · {T['chip_suffix']}</p>
         <h1 class="display">
           <span class="mask"><span class="mask__in" style="--d:.05s">{c['h1a']}</span></span>
           <span class="mask light"><span class="mask__in" style="--d:.17s">{c['h1b']}</span></span>
         </h1>
         <p class="lead" data-reveal style="--d:.35s">{c['lead']}</p>
         <div class="hero__cta" data-reveal style="--d:.45s">
-          <a class="btn" href="#byty"><span>Vybrat byt</span><i class="arrow" aria-hidden="true">→</i></a>
-          <a class="btn btn--ghost" href="#cenik"><span>Ceník a rezervace</span></a>
+          <a class="btn" href="#byty"><span>{T['cta_units']}</span><i class="arrow" aria-hidden="true">→</i></a>
+          <a class="btn btn--ghost" href="#cenik"><span>{T['cta_pricing']}</span></a>
         </div>
       </div>
       <div class="wrap hero-media__meta">
         <dl class="meta">{"".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in c['meta'])}</dl>
-        <a class="scroll-cue" href="#dum"><span>Dolů</span><i aria-hidden="true"></i></a>
+        <a class="scroll-cue" href="#dum"><span>{T['down']}</span><i aria-hidden="true"></i></a>
       </div>
-      <p class="hero-media__credit">Vizualizace · JA Architekti</p>
+      <p class="hero-media__credit">{T['credit']}</p>
     </section>
 
     <!-- ============ DŮM ============ -->
     <section class="section" id="dum" aria-labelledby="dum-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>01</span> Dům</p>
+        <p class="eyebrow" data-reveal><span>01</span> {T['sec_house']}</p>
         <h2 class="manifest" id="dum-title" data-reveal>{c['manifest']}</h2>
-        <div class="numbers">{"".join(f'<div data-reveal style="--d:.{i}s"><strong><span data-count="{n}">{n}</span>{("<small>" + u + "</small>") if u else ""}</strong><span>{l}</span></div>' for i, (n, u, l) in enumerate(c['numbers']))}</div>
+        <div class="numbers">{numbers}</div>
       </div>
     </section>
 
@@ -285,8 +329,8 @@ def project_page(c):
           <h2 class="display display--md" id="gal-title"><span class="mask"><span class="mask__in" data-in>{c['gal_h'][0]}</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">{c['gal_h'][1]}</span></span></h2>
           <p>{c['gal_p']}</p>
         </div>
-        <div class="gallery" aria-label="Galerie vizualizací">{gal}</div>
-        <p class="note" style="margin-top:1rem">Vizualizace JA Architekti. Zařízení interiéru je ilustrativní.</p>
+        <div class="gallery" aria-label="{T['gallery_aria']}">{gal}</div>
+        <p class="note" style="margin-top:1rem">{T['gallery_note']}</p>
       </div>
     </section>
 
@@ -299,61 +343,57 @@ def project_page(c):
     <!-- ============ BYTY ============ -->
     <section class="section explorer" id="byty" aria-labelledby="byty-title" data-explorer="{c['slug']}" data-img-base="{rel}assets/img/{c['slug']}/">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>02</span> Byty</p>
+        <p class="eyebrow" data-reveal><span>02</span> {T['sec_units']}</p>
         <div class="explorer__head">
           <h2 class="display display--md" id="byty-title">
-            <span class="mask"><span class="mask__in" data-in>Vyberte si</span></span>
-            <span class="mask light"><span class="mask__in" data-in style="--d:.12s">svůj byt.</span></span>
+            <span class="mask"><span class="mask__in" data-in>{T['units_h'][0]}</span></span>
+            <span class="mask light"><span class="mask__in" data-in style="--d:.12s">{T['units_h'][1]}</span></span>
           </h2>
-          <p class="legend" aria-label="Legenda">
-            <span><i class="lg-available"></i>Volný</span>
-            <span><i class="lg-reserved"></i>Rezervovaný</span>
-            <span><i class="lg-sold"></i>Prodaný</span>
+          <p class="legend" aria-label="{T['legend_aria']}">
+            <span><i class="lg-available"></i>{T['legend_av']}</span>
+            <span><i class="lg-reserved"></i>{T['legend_re']}</span>
+            <span><i class="lg-sold"></i>{T['legend_so']}</span>
           </p>
         </div>
 
         <div class="facade" data-facade="{c['slug']}" data-reveal>
           <img class="facade__img" src="{I(c['facade'])[:-5]}-2400.webp" srcset="{I(c['facade'])[:-5]}-1200.webp 1200w, {I(c['facade'])[:-5]}-2400.webp 2400w" sizes="(max-width: 1520px) 100vw, 1520px" width="2400" height="1610" alt="{c['facade_alt']}">
-          <span class="facade__hint">Najeďte myší na byt</span>
+          <span class="facade__hint">{T['facade_hint']}</span>
         </div>
-        <p class="facade__legend" data-reveal><span class="lg-available"><i></i>Volný</span><span class="lg-reserved"><i></i>Rezervovaný</span><span class="lg-sold"><i></i>Prodaný</span><span>Kliknutím otevřete detail bytu a půdorys</span></p>
+        <p class="facade__legend" data-reveal><span class="lg-available"><i></i>{T['legend_av']}</span><span class="lg-reserved"><i></i>{T['legend_re']}</span><span class="lg-sold"><i></i>{T['legend_so']}</span><span>{T['facade_click']}</span></p>
 
-{explorer_block(c['slug'], c['plan_note'], c['cad_note'])}
+{explorer_block(C, c['plan_note'], c['cad_note'])}
       </div>
     </section>
 
     <!-- ============ CENÍK A REZERVACE ============ -->
     <section class="section dark" id="cenik" aria-labelledby="cenik-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>03</span> Ceník</p>
+        <p class="eyebrow" data-reveal><span>03</span> {T['sec_pricing']}</p>
         <div class="reserve-head">
           <div>
             <h2 class="display display--md" id="cenik-title">
-              <span class="mask"><span class="mask__in" data-in>Rezervace</span></span>
-              <span class="mask light"><span class="mask__in" data-in style="--d:.12s">s výhodou.</span></span>
+              <span class="mask"><span class="mask__in" data-in>{T['pricing_h'][0]}</span></span>
+              <span class="mask light"><span class="mask__in" data-in style="--d:.12s">{T['pricing_h'][1]}</span></span>
             </h2>
           </div>
-          <div><p class="lead" data-reveal>Byty prodáváme v&nbsp;průběhu stavebního řízení. Kdo se rozhodne teď, získá slevu z&nbsp;ceny bytu podle výše složené zálohy. Záloha se započítává do kupní ceny.</p></div>
+          <div><p class="lead" data-reveal>{T['pricing_lead']}</p></div>
         </div>
 
         <dl class="price-extras" data-extras="{c['slug']}" data-reveal></dl>
 
         <div class="reserve-table-wrap" data-reservation="{c['slug']}" data-reveal></div>
-        <p class="note" style="margin-top:1rem"><span data-if-prices>Ceny bytů jsou uvedeny bez garážového stání a&nbsp;sklepu, které lze přikoupit. Cena po slevě se zaokrouhluje na tisíce Kč. </span><span data-if-no-prices>Ceník bytů, garážových stání a&nbsp;sklepů vám pošleme na vyžádání, stačí vyplnit formulář níže. Sleva se počítá z&nbsp;ceny bytu. </span>{c['price_note']}</p>
+        <p class="note" style="margin-top:1rem"><span data-if-prices>{T['note_prices']}</span><span data-if-no-prices>{T['note_noprices']}</span>{c['price_note']}</p>
 
-        <ol class="reserve-terms" data-reveal>
-          <li><strong>Vyberete byt a&nbsp;složíte zálohu</strong><p>3, 4 nebo 5&nbsp;mil.&nbsp;Kč podle toho, jakou slevu chcete získat. Záloha je součástí kupní ceny.</p></li>
-          <li><strong>Sleva je sjednaná ve smlouvě</strong><p>Sleva 3, 4 nebo 5&nbsp;% z&nbsp;ceny bytu se promítne do rezervační a&nbsp;následně kupní smlouvy.</p></li>
-          <li><strong>Jistota vrácení zálohy</strong><p>Pokud stavební povolení nenabude právní moci do <strong data-reservation-deadline>31. 10. 2028</strong>, vrátíme vám zálohu v&nbsp;plné výši. Způsob uložení zálohy upravuje rezervační smlouva.</p></li>
-        </ol>
-        <div data-reveal style="margin-top:2.5rem"><a class="btn btn--light" href="#rezervace"><span>Rezervovat byt</span><i class="arrow" aria-hidden="true">→</i></a></div>
+        <ol class="reserve-terms" data-reveal>{terms}</ol>
+        <div data-reveal style="margin-top:2.5rem"><a class="btn btn--light" href="#rezervace"><span>{T['reserve_btn']}</span><i class="arrow" aria-hidden="true">→</i></a></div>
       </div>
     </section>
 
     <!-- ============ TECHNOLOGIE ============ -->
     <section class="section" id="technologie" aria-labelledby="tech-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>04</span> Standard</p>
+        <p class="eyebrow" data-reveal><span>04</span> {T['sec_standard']}</p>
         <h2 class="display display--md" id="tech-title">
           <span class="mask"><span class="mask__in" data-in>{c['tech_h'][0]}</span></span>
           <span class="mask light"><span class="mask__in" data-in style="--d:.12s">{c['tech_h'][1]}</span></span>
@@ -366,7 +406,7 @@ def project_page(c):
     <!-- ============ LOKALITA + HARMONOGRAM ============ -->
     <section class="section dark" id="lokalita" aria-labelledby="lok-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>05</span> Lokalita</p>
+        <p class="eyebrow" data-reveal><span>05</span> {T['sec_location']}</p>
         <div class="addr">
           <div class="addr__copy">
             <h2 class="display display--md" id="lok-title"><span class="mask"><span class="mask__in" data-in>{c['lok_h'][0]}</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">{c['lok_h'][1]}</span></span></h2>
@@ -378,147 +418,63 @@ def project_page(c):
       </div>
     </section>
 
-{form(c['name'], True, True, ("Rezervujte si", "svůj byt."), "Vyplňte krátký formulář. Ozveme se vám, projdeme detaily a&nbsp;připravíme rezervační smlouvu.", ("Vyberete byt a&nbsp;odešlete nezávaznou žádost.", "Ozveme se vám, projdeme podmínky a&nbsp;výši zálohy.", "Po podpisu rezervační smlouvy je byt váš."), eyebrow=("06", "Rezervace"))}
+{form(C, c['name'], True, True, T['form_h'], T['form_lead'], T['form_how'], T['form_submit'], eyebrow=("06", T['sec_reserve']))}
 """
-    html += footer(rel, f"projects.{c['slug']}.seller", c.get("footnote", "")) + scripts(rel, (c["slug"],), explorer=True)
+    html += footer(C, f"projects.{c['slug']}.seller", c.get("footnote", "")) + scripts(C, (c["slug"],), explorer=True)
     return html
-
-KS = dict(
-    slug="ke-schodum", name="Rezidence ke Schodům", street="Ke Schodům", units=8,
-    title="Rezidence ke Schodům | Nico &amp; Kai Development", og="og-ke-schodum.jpg",
-    desc="Osm bytů s velkými terasami a zahradami v Praze-Modřanech. Pohledový beton, dřevo, tepelná čerpadla a fotovoltaika. Předprodej zahájen.",
-    hero="bdks_22", hero_alt="Rezidence ke Schodům – zahradní průčelí za soumraku", stage="Předprodej zahájen", video="ke-schodum",
-    h1a="Rezidence", h1b="ke&nbsp;Schodům",
-    lead="Osm bytů, osm teras a&nbsp;zahrad. Dům v&nbsp;klidné části Modřan, kde se bydlí uvnitř i&nbsp;venku.",
-    meta=[("Lokalita", "Praha-Modřany"), ("Byty", "8 · 2+kk a 3+kk"), ("Terasy", "19–104&nbsp;m²"), ("Dokončení", "2. čtvrtletí 2028")],
-    manifest="Každý byt má svou <strong>zahradu nebo terasu</strong>. Materiály, které stárnou krásně: <strong>pohledový beton, dřevo a&nbsp;sklo</strong>. A&nbsp;dům, který si energii vyrábí sám.",
-    numbers=[("8", "", "bytů 2+kk a 3+kk"), ("104", "m²", "největší terasa"), ("16", "", "garážových stání"), ("2028", "", "dokončení stavby")],
-    gal_h=("Dům, který", "chcete vidět zblízka."),
-    gal_p="Tři nadzemní podlaží s&nbsp;ustupujícími terasami, vegetační střechy a&nbsp;fasáda z&nbsp;patinovaného plechu, která mění barvu se světlem.",
-    gallery=[("bdks_13", "Rezidence ke Schodům z ulice", "Pohled z ulice", "is-big"), ("bdks_18", "Detail fasády a velkoformátových oken", "Detail fasády", ""), ("bdks_10", "Zahradní strana domu se zelení", "Zahrada", ""),
-             ("bdks_07", "Nároží domu se stromy", "Nároží", ""), ("bdks_19", "Dům za soumraku", "Soumrak", "is-wide"), ("bdks_09", "Dům v zimě", "Zima", ""),
-             ("bdks_03", "Vstup do domu", "Vstup", ""), ("bdks_20", "Severní strana s pavlačí", "Pavlač a vstupy do bytů", "is-wide"), ("bdks_08", "Večerní pohled na roh domu", "Večer", "")],
-    splits=[("bdks_10", "Terasy a zahrady Rezidence ke Schodům", "Terasa jako další pokoj.", "<p>Byty v&nbsp;přízemí mají vlastní zahradu, byty v&nbsp;patrech terasy od 25 do 104&nbsp;m². Dřevěná paluba, zeleň na střechách a&nbsp;skleněné zábradlí. Venku strávíte víc času, než jste čekali.</p>"),
-            ("bdks_18", "Detail fasády z patinovaného plechu", "Materiály, které stárnou krásně.", "<p>Fasáda z&nbsp;plechových panelů s&nbsp;přiznanými spárami mění barvu během dne. Uvnitř pohledový beton, třívrstvé dřevěné podlahy a&nbsp;minerální stěrky. Nic, co by se za pár let muselo předělávat.</p>"),
-            ("bdks_20", "Pavlač na severní straně domu", "Soukromí na prvním místě.", "<p>Do bytů se vchází z&nbsp;otevřených pavlačí na severní straně. Obytné místnosti a&nbsp;terasy míří na jih, do zahrady. Mezi byty je železobetonová stěna, sousedy neuslyšíte.</p>")],
-    facade="bdks_02", facade_alt="Jižní průčelí Rezidence ke Schodům – vyberte byt najetím myší",
-    plan_note="Půdorys z projektové dokumentace (12/2025). Plochy a&nbsp;dispozice dle projektu, závazné jsou údaje z&nbsp;prohlášení vlastníka.",
-    cad_note="Půdorys z projektové dokumentace pro povolení stavby (12/2025). Vybavení a zařízení je ilustrativní.",
-    price_note="Plocha bytu je uvedena jako odhad podlahové plochy dle nařízení vlády č. 366/2013 Sb., závazná bude v&nbsp;prohlášení vlastníka.",
-    tech_h=("Dům, který", "šetří energii."),
-    tech=[("Energie", ["Kaskáda tepelných čerpadel vzduch–voda", "Fotovoltaická elektrárna na střeše, bateriové úložiště", "Podlahové vytápění a&nbsp;chlazení", "Bez plynové přípojky"]),
-          ("Konstrukce a&nbsp;interiér", ["Železobetonová konstrukce, pohledový beton", "Třívrstvé dřevěné podlahy, minerální stěrky", "Velkoformátové zasklení, hliníková okna", "Stěny mezi byty Rw 57–58&nbsp;dB"]),
-          ("Dům", ["Výtah z&nbsp;garáže do všech podlaží", "16 garážových stání, 8 sklepů", "Vegetační střechy a&nbsp;společná střešní terasa", "Příprava na nabíjení elektromobilů"])],
-    tech_note="Údaje vycházejí z&nbsp;projektové dokumentace pro povolení stavby (12/2025). Finální provedení, dispozice a&nbsp;plochy se mohou změnit.",
-    lok_h=("Modřany,", "klid u Vltavy."),
-    lok_p="Vilová čtvrť nad Vltavou. Pět minut k&nbsp;řece a&nbsp;na cyklostezku, les v&nbsp;Modřanské rokli za rohem a&nbsp;tramvají do centra bez přestupu.",
-    addr=[("Adresa", "ulice Ke Schodům, Praha 12 – Modřany"), ("Katastr", "Modřany, parc. č. 1505/1"), ("Doprava", "tramvaj a&nbsp;autobus v&nbsp;docházkové vzdálenosti"), ("Příroda", "Vltava, Modřanská rokle"), ("Projektant", "JA Architekti, Ing. arch. Andrea Jašková")],
-    steps=[("12/2025", "Žádost o&nbsp;stavební povolení", "Dokumentace pro povolení stavby podána.", False), ("Nyní", "Předprodej", "Rezervace se slevou až 5&nbsp;%.", True), ("1. čtvrtletí 2027", "Zahájení výstavby", "Předpokládaný začátek stavby.", False), ("2. čtvrtletí 2028", "Dokončení", "Předpokládané předání bytů.", False)],
-)
-
-DC = dict(
-    slug="do-ctvrti", name="Rezidence Do Čtvrti", street="Do čtvrti 1145/20", units=6,
-    title="Rezidence Do Čtvrti | Nico &amp; Kai Development", og="og-do-ctvrti.jpg",
-    desc="Šest bytů v nárožním domě v Praze-Modřanech. Zahrady, balkony a střešní terasy, garáž a sklepy. Předprodej zahájen.",
-    hero="bddc_01a", hero_alt="Rezidence Do Čtvrti – nárožní dům za soumraku", stage="Předprodej zahájen", video="do-ctvrti",
-    h1a="Rezidence", h1b="Do&nbsp;Čtvrti",
-    lead="Šest bytů v&nbsp;domě se zaoblenými rohy a&nbsp;fasádou z&nbsp;perforovaného zdiva. Vždy jen dva byty na podlaží.",
-    meta=[("Lokalita", "Praha-Modřany"), ("Byty", "6 · 2+kk a 3+kk"), ("Venkovní prostory", "zahrady, balkony, terasy"), ("Souhlas IPR", "19. 10. 2026")],
-    manifest="Dům pro <strong>šest domácností</strong>. Přízemí se zahradou, patro s&nbsp;balkony, střecha s&nbsp;terasami. <strong>Vlastní výtah</strong> až do garáže a&nbsp;sousedé, které znáte jménem.",
-    numbers=[("6", "", "bytů 2+kk a 3+kk"), ("2", "", "byty na každém podlaží"), ("7", "", "garážových stání"), ("91", "m²", "největší zahrada")],
-    gal_h=("Jemné křivky,", "pevný charakter."),
-    gal_p="Nároží ulic Do čtvrti a&nbsp;Malá Tyršovka. Ustupující poslední podlaží, zaoblené rohy a&nbsp;zábradlí z&nbsp;perforovaných cihel, které propouští světlo i&nbsp;soukromí.",
-    gallery=[("bddc_03", "Rezidence Do Čtvrti – nároží za dne", "Nároží", "is-big"), ("bddc_int_01", "Obývací pokoj s kuchyní", "Obývací pokoj", ""), ("bddc_int_02", "Ložnice", "Ložnice", ""),
-             ("bddc_05a", "Vstupní průčelí ze severu při západu slunce", "Vstup z ulice", ""), ("bddc_16", "Zahradní průčelí zblízka", "Zahrada", "is-wide"), ("bddc_int_04", "Koupelna", "Koupelna", ""),
-             ("bddc_09", "Dům z nadhledu za soumraku", "Z nadhledu", ""), ("bddc_int_05", "Jídelna s terasou", "Jídelna", "is-wide"), ("bddc_12b", "Zimní pohled s vjezdem do garáže", "Zima", "")],
-    splits=[("bddc_17", "Zahradní průčelí za soumraku", "Zahrada za domem, ne za městem.", "<p>Byty v&nbsp;přízemí mají vlastní zahradu o&nbsp;84 a&nbsp;91&nbsp;m², patro balkony a&nbsp;horní byty střešní terasy přes 40&nbsp;m². Obytné místnosti jsou otočené k&nbsp;jihu, do zeleně.</p>"),
-            ("bddc_int_07", "Vstupní hala s perforovanou stěnou", "Světlo skrz cihlu.", "<p>Perforované zdivo na zábradlích a&nbsp;ve vstupní hale propouští světlo a&nbsp;zároveň chrání soukromí. Uvnitř omítky v&nbsp;teplých tónech, dřevo a&nbsp;kámen.</p>"),
-            ("bddc_rez", "Řez domem", "Dům v&nbsp;řezu.", "<p>Tři nadzemní podlaží, pod nimi garáž se sedmi stáními a&nbsp;ještě níž sklepy a&nbsp;technika. Výtah jezdí ze sklepa až ke dveřím bytu.</p>")],
-    facade="bddc_17", facade_alt="Zahradní průčelí Rezidence Do Čtvrti – vyberte byt najetím myší",
-    plan_note="Půdorys z projektové dokumentace (08/2026). Plocha bytu orientačně dle NV 366/2013 Sb. Závazné údaje budou v&nbsp;prohlášení vlastníka.",
-    cad_note="Půdorys z projektové dokumentace pro povolení stavby (08/2026). Vybavení a zařízení je ilustrativní.",
-    price_note="Plocha bytu je uvedena jako podlahová plocha dle nařízení vlády č. 366/2013 Sb. (orientační odhad z&nbsp;půdorysů), závazná bude v&nbsp;prohlášení vlastníka.",
-    tech_h=("Šetrný dům", "s vlastní energií."),
-    tech=[("Energie", ["Tepelná čerpadla vzduch–voda", "Fotovoltaická elektrárna na střeše", "Podlahové vytápění", "Bez plynové přípojky"]),
-          ("Konstrukce", ["Monolitická železobetonová konstrukce", "Plochá vegetační střecha", "Hliníková okna", "Perforované cihelné zábradlí"]),
-          ("Dům", ["Výtah od sklepa po střešní terasy", "7 garážových stání, 6 sklepů", "Příprava na nabíjení elektromobilů", "Klidná vilová čtvrť"])],
-    tech_note="Údaje vycházejí z&nbsp;projektové dokumentace pro povolení stavby (08/2026). Stavební řízení probíhá, finální řešení, dispozice a&nbsp;plochy se mohou změnit.",
-    lok_h=("Tyršova čtvrť,", "Modřany."),
-    lok_p="Nárožní parcela v&nbsp;klidné vilové zástavbě s&nbsp;rodinnými domy. Les na dosah, Vltava pod kopcem, centrum tramvají.",
-    addr=[("Adresa", "Do čtvrti 1145/20 a&nbsp;Malá Tyršovka, Praha 12 – Modřany"), ("Pozemek", "516&nbsp;m², parc. č. 1540, 1539/1, 1539/2"), ("Územní plán", "OB – čistě obytné, souhlas IPR Praha"), ("Příroda", "lesy nad Modřany, Vltava"), ("Projektant", "JA Architekti, Ing. arch. Andrea Jašková")],
-    steps=[("08/2026", "Žádost o&nbsp;povolení stavby", "Dokumentace podána, souhlas IPR Praha 19. 10. 2026.", False), ("Nyní", "Předprodej", "Rezervace se slevou až 5&nbsp;%.", True), ("2027", "Stavební povolení", "Předpokládané nabytí právní moci.", False), ("2029", "Dokončení", "Předpokládané předání bytů.", False)],
-)
 
 # ======================================================================
 # APARTMÁNY VYSOKÉ
 # ======================================================================
-def vysoke_page():
-    rel = "../"; I = lambda n: f"{rel}assets/img/vysoke/{n}.webp"
-    nav = [("#pribeh", "Apartmány"), ("#jednotky", "Volné jednotky"), ("#galerie", "Galerie"), ("#lokalita", "Lokalita"), ("#kontakt", "Kontakt")]
-    gal = "".join(fig(I(n), a, cap, k, widths=w) for n, a, cap, k, w in [
-        ("foto-14", "Apartmánové domy ve Vysokém nad Jizerou v zimě", "Domy v zimě", "is-big", (600, 1200, 1800)),
-        ("foto-07", "Koupelna s vanou pod střešním oknem", "Koupelna", "is-tall", (600, 1200, 1800)),
-        ("foto-11", "Dětský pokoj v podkroví", "Podkroví", "", (600, 1200, 1800)),
-        ("foto-08", "Ložnice s trámy", "Ložnice", "", (600, 1200, 1800)),
-        ("l11", "Pastviny nad Vysokým s výhledem na Krkonoše", "Výhled na Krkonoše", "is-wide", (600, 1200, 2400)),
-        ("foto-09", "Koupelna se sprchou", "Koupelna", "", (600, 1200, 1800)),
-        ("foto-06", "Dubové dveře a koupelna", "Detail", "", (600, 1200, 1800)),
-        ("l03", "Zimní západ slunce nad krajinou", "Zimní večer", "is-wide", (600, 1200, 2400)),
-        ("foto-01", "Kuchyně", "Kuchyně", "", (600, 1200, 1800)),
-        ("foto-12", "Schodiště do podkroví", "Schodiště", "", (600, 1200, 1800)),
-        ("l06", "Zasněžený les u Vysokého", "Zima v lese", "", (600, 1200, 2400)),
-        ("l07", "Rozhledna při západu slunce", "Rozhledna", "", (600, 1200, 2400)),
-    ])
-    html = head("Apartmány Vysoké | Nico &amp; Kai Development", "Apartmány Vysoké nad Jizerou: dokončené horské apartmány s terasami, zahradou a jezírkem. Poslední tři jednotky A2, B1 a B2 v prodeji.", "og-vysoke.jpg", rel, "vysoke")
-    html += header(rel, nav, "#kontakt", "Mám zájem", nav + [(rel, "Všechny projekty")])
+def vysoke_page(C):
+    T, rel, V = C.T, C.rel, VYSOKE[C.lang]; I = lambda n: f"{rel}assets/img/vysoke/{n}.webp"
+    gal = "".join(fig(I(n), a, cap, k, widths=w) for n, a, cap, k, w in V['gallery'])
+    numbers = "".join(f'<div data-reveal style="--d:.{i}s"><strong><span data-count="{n}">{n}</span>{("<small>" + u + "</small>") if u else ""}</strong><span>{l}</span></div>' for i, (n, u, l) in enumerate(V['numbers']))
+    html = head(C, V['title'], V['desc'], "og-vysoke.jpg")
+    html += header(C, V['nav'], "#kontakt", V['cta_header'], V['nav'] + [(C.home or "./", T['all_projects'])])
     html += f"""
     <section class="hero-media dark" id="top" data-atmo="snow">
-      <div class="hero-media__bg">{img(I('l03'), 'Zimní západ slunce nad Vysokým nad Jizerou', sizes='100vw', lazy=False)}</div>
+      <div class="hero-media__bg">{img(I('l03'), V['hero_alt'], sizes='100vw', lazy=False)}</div>
       <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
-        <p class="chip" data-reveal><i aria-hidden="true"></i>Dokončeno · poslední 3 apartmány</p>
+        <p class="chip" data-reveal><i aria-hidden="true"></i>{V['chip']}</p>
         <h1 class="display">
-          <span class="mask"><span class="mask__in" style="--d:.05s">Apartmány</span></span>
-          <span class="mask light"><span class="mask__in" style="--d:.17s">Vysoké</span></span>
+          <span class="mask"><span class="mask__in" style="--d:.05s">{V['h1a']}</span></span>
+          <span class="mask light"><span class="mask__in" style="--d:.17s">{V['h1b']}</span></span>
         </h1>
-        <p class="lead" data-reveal style="--d:.35s">Dva horské domy na kraji Vysokého nad Jizerou. Vlastní terasa, společná zahrada s&nbsp;přírodním jezírkem a&nbsp;Krkonoše na dohled.</p>
+        <p class="lead" data-reveal style="--d:.35s">{V['lead']}</p>
         <div class="hero__cta" data-reveal style="--d:.45s">
-          <a class="btn" href="#jednotky"><span>Volné apartmány</span><i class="arrow" aria-hidden="true">→</i></a>
-          <a class="btn btn--ghost" href="#galerie"><span>Galerie</span></a>
+          <a class="btn" href="#jednotky"><span>{V['cta1']}</span><i class="arrow" aria-hidden="true">→</i></a>
+          <a class="btn btn--ghost" href="#galerie"><span>{V['cta2']}</span></a>
         </div>
       </div>
       <div class="wrap hero-media__meta">
-        <dl class="meta"><div><dt>Lokalita</dt><dd>Vysoké nad Jizerou</dd></div><div><dt>Stav</dt><dd>Zkolaudováno</dd></div><div><dt>V nabídce</dt><dd>A2 · B1 · B2</dd></div><div><dt>Prodej</dt><dd>Svoboda &amp; Williams</dd></div></dl>
-        <a class="scroll-cue" href="#pribeh"><span>Dolů</span><i aria-hidden="true"></i></a>
+        <dl class="meta">{"".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in V['meta'])}</dl>
+        <a class="scroll-cue" href="#pribeh"><span>{T['down']}</span><i aria-hidden="true"></i></a>
       </div>
     </section>
 
     <section class="section" id="pribeh" aria-labelledby="pribeh-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>01</span> Apartmány</p>
-        <h2 class="manifest" id="pribeh-title" data-reveal>Místo, kam se <strong>jezdí odpočívat</strong>. Dřevo, trámy a&nbsp;střešní okna, pod nimiž se spí jinak. V&nbsp;zimě běžky od dveří, v&nbsp;létě jezírko na zahradě.</h2>
-        <div class="numbers">
-          <div data-reveal><strong><span data-count="2">2</span></strong><span>apartmánové domy</span></div>
-          <div data-reveal style="--d:.1s"><strong><span data-count="3">3</span></strong><span>poslední volné jednotky</span></div>
-          <div data-reveal style="--d:.2s"><strong><span data-count="193">193</span><small>m²</small></strong><span>apartmán B2, 5+kk</span></div>
-          <div data-reveal style="--d:.3s"><strong><span data-count="700">700</span><small>m n. m.</small></strong><span>Vysoké nad Jizerou</span></div>
-        </div>
+        <p class="eyebrow" data-reveal><span>01</span> {V['s1']}</p>
+        <h2 class="manifest" id="pribeh-title" data-reveal>{V['manifest']}</h2>
+        <div class="numbers">{numbers}</div>
       </div>
     </section>
 
     <section class="section dark" id="jednotky" aria-labelledby="jed-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>02</span> Volné jednotky</p>
+        <p class="eyebrow" data-reveal><span>02</span> {V['s2']}</p>
         <div class="section-head" data-reveal>
-          <h2 class="display display--md" id="jed-title"><span class="mask"><span class="mask__in" data-in>Poslední</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">tři apartmány.</span></span></h2>
-          <p>Ostatní jednotky už mají své majitele. Prodej posledních tří zajišťuje realitní kancelář Svoboda &amp; Williams.</p>
+          <h2 class="display display--md" id="jed-title"><span class="mask"><span class="mask__in" data-in>{V['units_h'][0]}</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">{V['units_h'][1]}</span></span></h2>
+          <p>{V['units_p']}</p>
         </div>
         <div class="ucards" data-units-cards="vysoke"></div>
         <div class="agent" data-reveal>
           <div class="agent__mono" aria-hidden="true">S&amp;W</div>
           <div>
             <strong>Jana Kocianová · Svoboda &amp; Williams</strong>
-            <span>Prodej apartmánů A2, B1 a&nbsp;B2. <a href="https://www.svoboda-williams.com/" rel="noopener" target="_blank">svoboda-williams.com ↗</a></span>
+            <span>{V['agent_line']} <a href="https://www.svoboda-williams.com/" rel="noopener" target="_blank">svoboda-williams.com ↗</a></span>
             <span data-cfg-wrap="projects.vysoke.agent.phone"><a data-cfg="projects.vysoke.agent.phone" data-cfg-href="tel:"></a></span>
             <span data-cfg-wrap="projects.vysoke.agent.email"><a data-cfg="projects.vysoke.agent.email" data-cfg-href="mailto:"></a></span>
           </div>
@@ -528,156 +484,112 @@ def vysoke_page():
 
     <section class="section" id="galerie" aria-labelledby="gal-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>03</span> Galerie</p>
+        <p class="eyebrow" data-reveal><span>03</span> {V['s3']}</p>
         <div class="section-head" data-reveal>
-          <h2 class="display display--md" id="gal-title"><span class="mask"><span class="mask__in" data-in>Hory</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">za oknem.</span></span></h2>
-          <p>Fotografie z&nbsp;dokončených apartmánů a&nbsp;z&nbsp;okolí Vysokého nad Jizerou.</p>
+          <h2 class="display display--md" id="gal-title"><span class="mask"><span class="mask__in" data-in>{V['gal_h'][0]}</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">{V['gal_h'][1]}</span></span></h2>
+          <p>{V['gal_p']}</p>
         </div>
-        <div class="gallery" aria-label="Galerie fotografií">{gal}</div>
+        <div class="gallery" aria-label="{T['photos_aria']}">{gal}</div>
       </div>
     </section>
 
     <section class="section dark" id="lokalita" aria-labelledby="lok-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>04</span> Lokalita</p>
+        <p class="eyebrow" data-reveal><span>04</span> {V['s4']}</p>
         <div class="addr">
           <div class="addr__copy">
-            <h2 class="display display--md" id="lok-title"><span class="mask"><span class="mask__in" data-in>Vysoké</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">nad Jizerou.</span></span></h2>
-            <p class="lead" data-reveal>Jedno z&nbsp;nejvýše položených měst v&nbsp;Česku na pomezí Krkonoš a&nbsp;Jizerských hor. Běžecké tratě, cyklotrasy, lyžařské vleky Šachty a&nbsp;Krakonošovo divadlo. Rokytnice a&nbsp;Harrachov za pár minut autem.</p>
+            <h2 class="display display--md" id="lok-title"><span class="mask"><span class="mask__in" data-in>{V['lok_h'][0]}</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">{V['lok_h'][1]}</span></span></h2>
+            <p class="lead" data-reveal>{V['lok_p']}</p>
           </div>
-          <div class="addr__list" data-reveal>
-            <div><span>Adresa</span><strong>K. Havlíčka Borovského 442/443, 512 11 Vysoké nad Jizerou</strong></div>
-            <div><span>Nadmořská výška</span><strong>cca 700 m n. m.</strong></div>
-            <div><span>Zima</span><strong>běžecké tratě, vleky Šachty, Rokytnice, Harrachov</strong></div>
-            <div><span>Léto</span><strong>cyklotrasy, turistika, jezírko na zahradě</strong></div>
-            <div><span>Ve městě</span><strong>škola, nemocnice, pekárna, restaurace, divadlo</strong></div>
-          </div>
+          <div class="addr__list" data-reveal>{"".join(f"<div><span>{k}</span><strong>{v}</strong></div>" for k, v in V['addr'])}</div>
         </div>
       </div>
     </section>
 
-{form("Apartmány Vysoké", False, False, ("Chci vědět", "víc."), "Napište nám, kterého apartmánu se váš zájem týká. Předáme ho makléřce a&nbsp;ozveme se vám.", (), "Odeslat", eyebrow=("05", "Kontakt")).replace('id="rezervace"', 'id="kontakt"')}
+{form(C, "Apartmány Vysoké", False, False, V['form_h'], V['form_lead'], (), T['send'], eyebrow=("05", V['s5'])).replace('id="rezervace"', 'id="kontakt"')}
 """
-    html += footer(rel, "company") + scripts(rel, ("vysoke",))
+    html += footer(C, "company") + scripts(C, ("vysoke",))
     return html
 
 # ======================================================================
 # REZIDENCE VLNITÁ
 # ======================================================================
-def vlnita_page():
-    rel = "../"; I = lambda n: f"{rel}assets/img/vlnita/{n}.webp"
-    nav = [("#pribeh", "O domě"), ("#galerie", "Galerie"), (rel + "#projekty", "Aktuální projekty")]
-    gal = "".join(fig(I(n), a, cap, k, widths=(600, 1200, 1800)) for n, a, cap, k in [
-        ("foto-02", "Rezidence Vlnitá z ulice při západu slunce", "Z ulice", "is-big"), ("foto-04", "Kuchyně s dřevěnou dýhou", "Kuchyně", "is-tall"),
-        ("foto-13", "Obývací pokoj s krbem", "Obývací pokoj", "is-tall"), ("foto-05", "Kuchyně a dubové dveře", "Detail", ""), ("foto-03", "Průčelí domu", "Průčelí", "")])
-    html = head("Rezidence Vlnitá | Nico &amp; Kai Development", "Rezidence Vlnitá: dokončený rezidenční projekt Nico & Kai Development v Praze. Všechny byty prodány.", "og-vlnita.jpg", rel, "vlnita", theme="#ffffff")
-    html += header(rel, nav, rel + "#projekty", "Aktuální projekty", nav)
+def vlnita_page(C):
+    T, rel, V = C.T, C.rel, VLNITA[C.lang]; I = lambda n: f"{rel}assets/img/vlnita/{n}.webp"
+    nav = [(h.replace("HOME", C.home), t) for h, t in V['nav']]
+    gal = "".join(fig(I(n), a, cap, k, widths=(600, 1200, 1800)) for n, a, cap, k in V['gallery'])
+    html = head(C, V['title'], V['desc'], "og-vlnita.jpg", theme="#ffffff")
+    html += header(C, nav, C.home + "#projekty", V['cta_header'], nav)
     html += f"""
     <section class="hero" id="top">
       <div class="wrap hero__grid">
         <div class="hero__copy">
-          <p class="sold-banner" data-reveal><i aria-hidden="true"></i>Prodáno · dokončeno</p>
+          <p class="sold-banner" data-reveal><i aria-hidden="true"></i>{V['banner']}</p>
           <h1 class="display">
-            <span class="mask"><span class="mask__in" style="--d:.05s">Rezidence</span></span>
-            <span class="mask light"><span class="mask__in" style="--d:.17s">Vlnitá</span></span>
+            <span class="mask"><span class="mask__in" style="--d:.05s">{V['h1a']}</span></span>
+            <span class="mask light"><span class="mask__in" style="--d:.17s">{V['h1b']}</span></span>
           </h1>
-          <p class="lead" data-reveal style="--d:.35s">Dokončený dům v&nbsp;Praze. Všechny byty mají své majitele. Zůstává jako ukázka toho, jak stavíme.</p>
+          <p class="lead" data-reveal style="--d:.35s">{V['lead']}</p>
           <div class="hero__cta" data-reveal style="--d:.45s">
-            <a class="btn" href="{rel}ke-schodum/"><span>Rezidence ke Schodům</span><i class="arrow" aria-hidden="true">→</i></a>
-            <a class="btn btn--ghost" href="{rel}do-ctvrti/"><span>Rezidence Do Čtvrti</span></a>
+            <a class="btn" href="{C.home}ke-schodum/"><span>{T['ks']}</span><i class="arrow" aria-hidden="true">→</i></a>
+            <a class="btn btn--ghost" href="{C.home}do-ctvrti/"><span>{T['dc']}</span></a>
           </div>
         </div>
-        <div class="hero__art" style="margin-right:0">{img(I('foto-02'), 'Rezidence Vlnitá z ulice', widths=(600, 1200, 1800), sizes='(max-width: 880px) 100vw, 55vw', lazy=False)}</div>
+        <div class="hero__art" style="margin-right:0">{img(I('foto-02'), V['hero_alt'], widths=(600, 1200, 1800), sizes='(max-width: 880px) 100vw, 55vw', lazy=False)}</div>
       </div>
       <div class="wrap hero__meta">
-        <dl class="meta"><div><dt>Lokalita</dt><dd>Praha</dd></div><div><dt>Stav</dt><dd>Prodáno, dokončeno</dd></div><div><dt>Typ</dt><dd>Rezidenční dům</dd></div></dl>
-        <a class="scroll-cue" href="#pribeh"><span>Dolů</span><i aria-hidden="true"></i></a>
+        <dl class="meta">{"".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in V['meta'])}</dl>
+        <a class="scroll-cue" href="#pribeh"><span>{T['down']}</span><i aria-hidden="true"></i></a>
       </div>
     </section>
 
     <section class="section dark" id="pribeh" aria-labelledby="pribeh-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>01</span> O domě</p>
-        <h2 class="manifest" id="pribeh-title" data-reveal>Čisté linie, <strong>tmavé dřevo a&nbsp;světlo</strong>. Dům, u&nbsp;kterého jsme si ověřili, že <strong>detail rozhoduje</strong>: od dubových dveří po kování.</h2>
+        <p class="eyebrow" data-reveal><span>01</span> {V['s1']}</p>
+        <h2 class="manifest" id="pribeh-title" data-reveal>{V['manifest']}</h2>
         <div class="split" style="margin-top:clamp(3rem,7vw,6rem)" data-reveal>
-          <div class="split__media">{img(I('foto-13'), 'Obývací pokoj s krbem', widths=(600, 1200, 1800), sizes='(max-width: 880px) 100vw, 58vw')}</div>
-          <div class="split__copy"><h3>Co jsme si odnesli.</h3><p>Velká okna, krb a&nbsp;jeden materiál na podlaze v&nbsp;celém bytě. Méně prvků, zato lepších. Stejný přístup dnes vedeme do Rezidence ke Schodům a&nbsp;Do Čtvrti.</p></div>
+          <div class="split__media">{img(I('foto-13'), V['split_alt'], widths=(600, 1200, 1800), sizes='(max-width: 880px) 100vw, 58vw')}</div>
+          <div class="split__copy"><h3>{V['split_h']}</h3><p>{V['split_p']}</p></div>
         </div>
       </div>
     </section>
 
     <section class="section" id="galerie" aria-labelledby="gal-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>02</span> Galerie</p>
-        <div class="gallery" aria-label="Galerie fotografií">{gal}</div>
-        <p class="note" style="margin-top:1rem">Fotografie dokončeného domu.</p>
+        <p class="eyebrow" data-reveal><span>02</span> {V['s2']}</p>
+        <div class="gallery" aria-label="{T['photos_aria']}">{gal}</div>
+        <p class="note" style="margin-top:1rem">{V['gal_note']}</p>
         <div data-reveal style="margin-top:clamp(2rem,5vw,4rem);display:flex;gap:.75rem;flex-wrap:wrap">
-          <a class="btn" href="{rel}ke-schodum/"><span>Aktuálně v prodeji: Ke Schodům</span><i class="arrow" aria-hidden="true">→</i></a>
-          <a class="btn btn--ghost" href="{rel}do-ctvrti/"><span>Do Čtvrti</span></a>
+          <a class="btn" href="{C.home}ke-schodum/"><span>{V['cta_now']}</span><i class="arrow" aria-hidden="true">→</i></a>
+          <a class="btn btn--ghost" href="{C.home}do-ctvrti/"><span>{V['cta_dc']}</span></a>
         </div>
       </div>
     </section>
 """
-    html += footer(rel, "company") + scripts(rel, ("vlnita",))
+    html += footer(C, "company") + scripts(C, ("vlnita",))
     return html
-
 
 # ======================================================================
 # OCHRANA OSOBNÍCH ÚDAJŮ
 # ======================================================================
-def legal_page():
-    rel = "../"
-    nav = [(rel + "#projekty", "Projekty"), (rel + "ke-schodum/", "Ke Schodům"), (rel + "do-ctvrti/", "Do Čtvrti"), (rel + "#kontakt", "Kontakt")]
-    html = head("Ochrana osobních údajů | Nico &amp; Kai Development", "Zásady zpracování osobních údajů na webu Nico & Kai Development.", "og.jpg", rel, "gdpr", theme="#ffffff", extra_head='\n  <meta name="robots" content="noindex, follow">')
-    html += header(rel, nav, rel + "#kontakt", "Kontakt", nav)
+def legal_page(C):
+    T, V = C.T, LEGAL[C.lang]
+    nav = [(h.replace("HOME", C.home), t) for h, t in V['nav']]
+    html = head(C, V['title'], V['desc'], "og.jpg", theme="#ffffff", extra_head='\n  <meta name="robots" content="noindex, follow">')
+    html += header(C, nav, C.home + "#kontakt", V['cta_header'], nav)
     html += f"""
     <section class="section legal" id="top">
       <div class="wrap">
-        <p class="eyebrow" data-reveal>Právní informace</p>
-        <h1 class="display display--md"><span class="mask"><span class="mask__in" data-in>Ochrana</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">osobních údajů.</span></span></h1>
+        <p class="eyebrow" data-reveal>{V['eyebrow']}</p>
+        <h1 class="display display--md"><span class="mask"><span class="mask__in" data-in>{V['h'][0]}</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">{V['h'][1]}</span></span></h1>
         <div class="legal__body" data-reveal>
-          <p class="lead">Vážíme si vašeho zájmu o&nbsp;naše domy a&nbsp;stejně tak vašeho soukromí. Tady najdete, jaké údaje zpracováváme, proč a&nbsp;jaká máte práva.</p>
-
-          <h2>1. Kdo údaje zpracovává</h2>
-          <p>Správcem osobních údajů je <strong><span data-cfg="company.legalName">Nico &amp; Kai Development</span></strong><span data-cfg-wrap="company.ico">, IČO <span data-cfg="company.ico"></span></span><span data-cfg-wrap="company.address">, se sídlem <span data-cfg="company.address"></span></span> (dále „my“). U&nbsp;Rezidence ke Schodům je prodávajícím společnost Rezidence Ke schodům s.r.o., IČO 23662956, Ke schodům 1465/14, 143&nbsp;00 Praha 12 – Modřany, které vaši poptávku předáme.</p>
-          <p data-cfg-wrap="company.email">Kontakt ve věcech osobních údajů: <a data-cfg="company.email" data-cfg-href="mailto:"></a>.</p>
-
-          <h2>2. Jaké údaje zpracováváme</h2>
-          <ul>
-            <li><strong>Údaje z&nbsp;formuláře:</strong> jméno a&nbsp;příjmení, e-mail, telefon (pokud ho uvedete), text zprávy, vybraný byt a&nbsp;zájem o&nbsp;garážové stání nebo sklep.</li>
-            <li><strong>Technické údaje:</strong> při načtení webu zpracovává poskytovatel hostingu IP adresu a&nbsp;údaje o&nbsp;prohlížeči v&nbsp;provozních záznamech serveru.</li>
-          </ul>
-          <p>Web nepoužívá sledovací cookies ani analytické nástroje třetích stran. Prohlížeč si pouze po dobu návštěvy pamatuje, že jste už viděli úvodní animaci (technická nezbytnost, žádné osobní údaje).</p>
-
-          <h2>3. Proč údaje zpracováváme a&nbsp;na jakém základě</h2>
-          <ul>
-            <li><strong>Odpověď na váš dotaz a&nbsp;jednání o&nbsp;rezervaci bytu</strong> – jednání o&nbsp;uzavření smlouvy na vaši žádost (čl. 6 odst. 1 písm. b) nařízení GDPR).</li>
-            <li><strong>Zasílání informací o&nbsp;projektu</strong>, o&nbsp;který jste projevili zájem (novinky o&nbsp;stavbě, ceník, termíny) – na základě vašeho souhlasu (čl. 6 odst. 1 písm. a) GDPR). Souhlas můžete kdykoli odvolat.</li>
-            <li><strong>Provoz a&nbsp;zabezpečení webu</strong> – náš oprávněný zájem (čl. 6 odst. 1 písm. f) GDPR).</li>
-          </ul>
-
-          <h2>4. Jak dlouho údaje uchováváme</h2>
-          <p>Po dobu jednání o&nbsp;rezervaci a&nbsp;koupi bytu a&nbsp;dále nejdéle 3&nbsp;roky od posledního kontaktu, nebo do odvolání souhlasu, podle toho, co nastane dříve. Údaje, které jsou součástí smlouvy, uchováváme po dobu stanovenou právními předpisy.</p>
-
-          <h2>5. Komu údaje předáváme</h2>
-          <ul>
-            <li>Prodávajícímu daného projektu (viz bod 1), aby mohl s&nbsp;vámi jednat o&nbsp;rezervaci.</li>
-            <li>U&nbsp;Apartmánů Vysoké realitní kanceláři Svoboda &amp; Williams, která zajišťuje prodej posledních jednotek.</li>
-            <li>Poskytovateli hostingu webu (GitHub, Inc., USA – provozní záznamy serveru; předání je zajištěno standardními smluvními doložkami EU) a&nbsp;poskytovateli e-mailové služby.</li>
-          </ul>
-          <p>Údaje nikomu neprodáváme ani nepředáváme pro marketing třetích stran.</p>
-
-          <h2>6. Vaše práva</h2>
-          <p>Máte právo na přístup ke svým údajům, jejich opravu nebo výmaz, omezení zpracování, přenositelnost, právo vznést námitku a&nbsp;právo kdykoli odvolat souhlas (odvoláním není dotčena zákonnost zpracování před odvoláním). Stačí nám napsat. Pokud se domníváte, že údaje zpracováváme v&nbsp;rozporu s&nbsp;právem, můžete podat stížnost u&nbsp;Úřadu pro ochranu osobních údajů, Pplk. Sochora 27, 170&nbsp;00 Praha 7, <a href="https://uoou.gov.cz" rel="noopener" target="_blank">uoou.gov.cz</a>.</p>
-
-          <h2>7. Změny těchto zásad</h2>
-          <p>Zásady můžeme upravit, například při změně hostingu nebo nástrojů. Aktuální znění je vždy na této stránce.</p>
-          <p class="legal__date">Účinnost od 21. 11. 2026.</p>
+          <p class="lead">{V['lead']}</p>
+{V['body']}
         </div>
       </div>
     </section>
 """
-    html += footer(rel, "company") + scripts(rel, ())
+    html += footer(C, "company") + scripts(C, ())
     return html
 
 # ======================================================================
@@ -686,12 +598,13 @@ def legal_page():
 def notfound_page():
     with open(os.path.join(ROOT, "assets/img/logo/nk-logo-nad-sebou-bile.svg"), encoding="utf-8") as f:
         logo = f.read().replace('width="297.85" height="249.3"', 'width="140" height="117"')
+    N = NOTFOUND
     return f"""<!doctype html>
 <html lang="cs">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Stránka nenalezena | Nico &amp; Kai Development</title>
+  <title>{N['cs']['title']}</title>
   <meta name="robots" content="noindex">
   <style>
     html{{background:#000;color:#fff}}
@@ -700,7 +613,9 @@ def notfound_page():
     svg{{margin-bottom:2.5rem}}
     h1{{font-size:clamp(2.2rem,7vw,4.5rem);font-weight:800;letter-spacing:-.04em;line-height:.95;margin:0 0 1rem}}
     h1 span{{display:block;font-weight:300}}
-    p{{color:#bdbdb8;font-size:1.05rem;line-height:1.55;margin:0 0 2rem}}
+    p{{color:#bdbdb8;font-size:1.05rem;line-height:1.55;margin:0 0 .5rem}}
+    p.alt{{font-size:.9rem;color:#8a8a85}}
+    nav{{margin-top:2rem}}
     a{{display:inline-block;color:#000;background:#fff;text-decoration:none;font-weight:800;padding:.95rem 1.6rem;letter-spacing:-.01em}}
     a+a{{background:transparent;color:#fff;border:1px solid #fff;margin-left:.5rem}}
   </style>
@@ -708,12 +623,14 @@ def notfound_page():
 <body>
   <main>
     {logo}
-    <h1>Tady nic nestojí.<span>Zatím.</span></h1>
-    <p>Stránka, kterou hledáte, neexistuje nebo se přestěhovala.</p>
-    <nav><a id="home" href="/">Úvodní stránka</a><a id="ks" href="/ke-schodum/">Rezidence ke Schodům</a></nav>
+    <h1>{N['cs']['h1']}<span>{N['cs']['h2']}</span></h1>
+    <p>{N['cs']['p']}</p>
+    <p class="alt" lang="en">{N['en']['h1']} {N['en']['h2']} {N['en']['p']}</p>
+    <p class="alt" lang="de">{N['de']['h1']} {N['de']['h2']} {N['de']['p']}</p>
+    <nav><a id="home" href="/">{N['cs']['home']}</a><a id="ks" href="/ke-schodum/">{N['cs']['ks']}</a></nav>
   </main>
   <script>
-    (function(){{var r=location.pathname.indexOf('/nicoandkai-web/')===0?'/nicoandkai-web/':'/';document.getElementById('home').href=r;document.getElementById('ks').href=r+'ke-schodum/';
+    (function(){{var r=location.pathname.indexOf('/nicoandkai-web/')===0?'/nicoandkai-web/':'/';var l=/^\\/(nicoandkai-web\\/)?(en|de)\\//.exec(location.pathname);var h=r+(l?l[2]+'/':'');document.getElementById('home').href=h;document.getElementById('ks').href=h+'ke-schodum/';
     var s=document.createElement('style');s.textContent='@font-face{{font-family:Manrope;src:url('+r+'assets/fonts/Manrope-Variable.woff2) format("woff2");font-weight:200 800;font-display:swap}}';document.head.appendChild(s);}})();
   </script>
 </body>
@@ -721,18 +638,22 @@ def notfound_page():
 """
 
 def sitemap_xml():
-    urls = "".join(f"  <url><loc>{SITE_URL}/{p}</loc><changefreq>weekly</changefreq><priority>{pr}</priority></url>\n"
-                   for p, pr in [("", "1.0"), ("ke-schodum/", "0.9"), ("do-ctvrti/", "0.9"), ("apartmany-vysoke/", "0.7"), ("rezidence-vlnita/", "0.4")])
-    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
+    pri = {"home": "1.0", "ke-schodum": "0.9", "do-ctvrti": "0.9", "vysoke": "0.7", "vlnita": "0.4"}
+    out = ""
+    for key in ["home", "ke-schodum", "do-ctvrti", "vysoke", "vlnita"]:
+        for lang in LANGS:
+            loc = f"{SITE_URL}/{LANG_META[lang]['prefix']}{page_path(lang, key)}"
+            alts = "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{SITE_URL}/{LANG_META[l]["prefix"]}{page_path(l, key)}"/>' for l in LANGS)
+            out += f"  <url><loc>{loc}</loc>{alts}<changefreq>weekly</changefreq><priority>{pri[key] if lang == 'cs' else str(round(float(pri[key]) - 0.1, 1))}</priority></url>\n"
+    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n{out}</urlset>\n'
 
 # ======================================================================
 # ÚVOD
 # ======================================================================
-def home_page():
-    rel = ""; I = lambda p: f"assets/img/{p}.webp"
-    nav = [("#projekty", "Projekty"), ("#pristup", "Jak stavíme"), ("#reference", "Reference"), ("#kontakt", "Kontakt")]
+def home_page(C):
+    T, rel, H = C.T, C.rel, HOME[C.lang]; I = lambda p: f"{rel}assets/img/{p}.webp"
     def card(href, image, alt, badge, live, title_a, title_b, meta, text, cta, sold=False, widths=(600, 1200, 2400)):
-        return f"""          <a class="pcard2{' pcard2--sold' if sold else ''}" href="{href}" data-reveal>
+        return f"""          <a class="pcard2{' pcard2--sold' if sold else ''}" href="{C.home}{href}" data-reveal>
             <div class="pcard2__media"><span class="pcard2__badge{' is-live' if live else ''}{' is-sold' if sold else ''}"><i aria-hidden="true"></i>{badge}</span>{img(I(image), alt, widths, '(max-width: 880px) 100vw, 50vw')}</div>
             <div class="pcard2__body">
               <h3 class="pcard2__title">{title_a} <span class="light">{title_b}</span></h3>
@@ -742,68 +663,75 @@ def home_page():
             </div>
           </a>
 """
-    html = head("Nico &amp; Kai Development | Rezidenční projekty v Praze a v horách", "Nico & Kai Development staví domy, ve kterých se dobře žije. Rezidence ke Schodům a Do Čtvrti v Praze-Modřanech v předprodeji, Apartmány Vysoké a Rezidence Vlnitá dokončeny.", "og.jpg", rel, "home", extra_head="""
-  <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "Organization", "name": "Nico & Kai Development", "description": "Rezidenční development v Praze a v horách.", "areaServed": "Česká republika"}
-  </script>""")
-    html += """  <div class="splash" aria-hidden="true"><img src="assets/img/logo/nk-logo-nad-sebou-bile.svg" alt=""><div class="splash__bar"><i></i></div></div>
+    cards = "".join(card(h, im, a, b, live, ta, tb, m, t, cta, sold, (600, 1200, 1800) if sold else (600, 1200, 2400)) for h, im, a, b, live, ta, tb, m, t, cta, sold in H['cards'])
+    numbers = "".join(f'<div data-reveal style="--d:.{i}s"><strong><span data-count="{n}">{n}</span>{("<small>" + u + "</small>") if u else ""}</strong><span>{l}</span></div>' for i, (n, u, l) in enumerate(H['numbers']))
+    hows = ""
+    for i, (im, a, h3, p) in enumerate(H['how']):
+        hows += f"""        <div class="split{' split--flip' if i % 2 else ''}" data-reveal>
+          <div class="split__media">{img(I(im), a, sizes='(max-width: 880px) 100vw, 58vw')}</div>
+          <div class="split__copy"><h3>{h3}</h3><p>{p}</p></div>
+        </div>
 """
-    html += header(rel, nav, "ke-schodum/", "Vybrat byt", nav)
+    refs = ""
+    for i, (href, im, a, ta, tb, text, cta, sold) in enumerate(H['ref_cards']):
+        refs += f"""          <a class="pcard2{' pcard2--sold' if sold else ''}" href="{C.home}{href}" data-reveal{' style="--d:.1s"' if i else ''}>
+            <div class="pcard2__media">{img(I(im), a, (600, 1200, 1800), '(max-width: 880px) 100vw, 50vw')}</div>
+            <div class="pcard2__body"><h3 class="pcard2__title">{ta} <span class="light">{tb}</span></h3><p class="pcard2__text">{text}</p><span class="pcard2__cta">{cta} <i aria-hidden="true">→</i></span></div>
+          </a>
+"""
+    html = head(C, H['title'], H['desc'], "og.jpg", extra_head=f"""
+  <script type="application/ld+json">
+  {{"@context": "https://schema.org", "@type": "Organization", "name": "Nico & Kai Development", "description": "{H['org_desc']}", "areaServed": "Česká republika", "url": "{SITE_URL}/"}}
+  </script>""")
+    html += f"""  <div class="splash" aria-hidden="true"><img src="{rel}assets/img/logo/nk-logo-nad-sebou-bile.svg" alt=""><div class="splash__bar"><i></i></div></div>
+"""
+    html += header(C, H['nav'], C.home + "ke-schodum/", H['cta_header'], H['nav'])
     html += f"""
     <!-- ============ HERO ============ -->
     <section class="hero-media dark" id="top" data-atmo="mist">
       <div class="hero-media__bg is-slides">
-        {img(I('do-ctvrti/bddc_01a'), 'Rezidence Do Čtvrti za soumraku', sizes='100vw', lazy=False)}
-        {img(I('ke-schodum/bdks_19'), 'Rezidence ke Schodům za soumraku', sizes='100vw')}
+        {img(I('do-ctvrti/bddc_01a'), 'Rezidence Do Čtvrti', sizes='100vw', lazy=False)}
+        {img(I('ke-schodum/bdks_19'), 'Rezidence ke Schodům', sizes='100vw')}
         {video(rel, 'do-ctvrti')}{video(rel, 'ke-schodum')}
       </div>
       <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
-        <p class="eyebrow" data-reveal>Nico &amp; Kai Development</p>
+        <p class="eyebrow" data-reveal>{H['eyebrow']}</p>
         <h1 class="display">
-          <span class="mask"><span class="mask__in" style="--d:.05s">Domov,</span></span>
-          <span class="mask light"><span class="mask__in" style="--d:.17s">na který se těšíte.</span></span>
+          <span class="mask"><span class="mask__in" style="--d:.05s">{H['h1a']}</span></span>
+          <span class="mask light"><span class="mask__in" style="--d:.17s">{H['h1b']}</span></span>
         </h1>
-        <p class="lead" data-reveal style="--d:.35s">Stavíme domy pro skutečný život. Ne metry čtvereční, ale místa, kam se chcete vracet. V&nbsp;Praze i&nbsp;v&nbsp;horách.</p>
+        <p class="lead" data-reveal style="--d:.35s">{H['lead']}</p>
         <div class="hero__cta" data-reveal style="--d:.45s">
-          <a class="btn" href="#projekty"><span>Naše projekty</span><i class="arrow" aria-hidden="true">→</i></a>
-          <a class="btn btn--ghost" href="ke-schodum/"><span>Předprodej: Ke Schodům</span></a>
+          <a class="btn" href="#projekty"><span>{H['cta1']}</span><i class="arrow" aria-hidden="true">→</i></a>
+          <a class="btn btn--ghost" href="{C.home}ke-schodum/"><span>{H['cta2']}</span></a>
         </div>
       </div>
       <div class="wrap hero-media__meta">
-        <dl class="meta"><div><dt>V předprodeji</dt><dd>Rezidence ke&nbsp;Schodům · Do&nbsp;Čtvrti</dd></div><div><dt>V nabídce</dt><dd>Apartmány Vysoké</dd></div><div><dt>Dokončeno</dt><dd>Rezidence Vlnitá</dd></div></dl>
-        <a class="scroll-cue" href="#manifest"><span>Dolů</span><i aria-hidden="true"></i></a>
+        <dl class="meta">{"".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in H['meta'])}</dl>
+        <a class="scroll-cue" href="#manifest"><span>{T['down']}</span><i aria-hidden="true"></i></a>
       </div>
     </section>
 
     <!-- ============ MANIFEST ============ -->
     <section class="section" id="manifest" aria-labelledby="manifest-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>01</span> Kdo jsme</p>
-        <h2 class="manifest" id="manifest-title" data-reveal>Neprodáváme byty. <strong>Vytváříme místa, kde se žije dobře.</strong> Promyšlená architektura, poctivé materiály a&nbsp;otevřená komunikace od první schůzky po předání klíčů.</h2>
-        <div class="numbers">
-          <div data-reveal><strong><span data-count="4">4</span></strong><span>rezidenční projekty</span></div>
-          <div data-reveal style="--d:.1s"><strong><span data-count="2">2</span></strong><span>dokončené a předané</span></div>
-          <div data-reveal style="--d:.2s"><strong><span data-count="17">17</span></strong><span>bytů v aktuální nabídce</span></div>
-          <div data-reveal style="--d:.3s"><strong><span data-count="100">100</span><small>%</small></strong><span>projektů s vlastní zahradou nebo terasou</span></div>
-        </div>
+        <p class="eyebrow" data-reveal><span>01</span> {H['s1']}</p>
+        <h2 class="manifest" id="manifest-title" data-reveal>{H['manifest']}</h2>
+        <div class="numbers">{numbers}</div>
       </div>
     </section>
 
     <!-- ============ PROJEKTY ============ -->
     <section class="section dark" id="projekty" aria-labelledby="projects-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>02</span> Projekty</p>
+        <p class="eyebrow" data-reveal><span>02</span> {H['s2']}</p>
         <div class="section-head" data-reveal>
-          <h2 class="display display--md" id="projects-title"><span class="mask"><span class="mask__in" data-in>Naše</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">domy.</span></span></h2>
-          <p>Dva domy v&nbsp;Praze-Modřanech právě v&nbsp;předprodeji, horské apartmány s&nbsp;posledními třemi jednotkami a&nbsp;dokončená rezidence, která je naší vizitkou.</p>
+          <h2 class="display display--md" id="projects-title"><span class="mask"><span class="mask__in" data-in>{H['projects_h'][0]}</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">{H['projects_h'][1]}</span></span></h2>
+          <p>{H['projects_p']}</p>
         </div>
         <div class="pgrid">
-{card("ke-schodum/", "ke-schodum/bdks_13", "Rezidence ke Schodům", "Předprodej zahájen", True, "Rezidence", "ke&nbsp;Schodům", ["Praha-Modřany", "8 bytů · 2+kk a 3+kk", "terasy až 104 m²"], "Osm bytů s&nbsp;terasami a&nbsp;zahradami, pohledový beton a&nbsp;dům, který si vyrábí energii. Rezervace se slevou až 5&nbsp;%.", "Vybrat byt")}
-{card("do-ctvrti/", "do-ctvrti/bddc_03", "Rezidence Do Čtvrti", "Předprodej zahájen", True, "Rezidence", "Do&nbsp;Čtvrti", ["Praha-Modřany", "6 bytů · 2+kk a 3+kk", "zahrady a střešní terasy"], "Nárožní dům se zaoblenými rohy a&nbsp;perforovanou cihlou. Jen dva byty na podlaží. Rezervace se slevou až 5&nbsp;%.", "Vybrat byt")}
-{card("apartmany-vysoke/", "vysoke/l03", "Apartmány Vysoké", "Poslední 3 apartmány", False, "Apartmány", "Vysoké", ["Vysoké nad Jizerou", "A2 · B1 · B2", "dokončeno"], "Horské apartmány s&nbsp;terasami, společnou zahradou a&nbsp;jezírkem. Prodej posledních jednotek zajišťuje Svoboda &amp; Williams.", "Volné apartmány")}
-{card("rezidence-vlnita/", "vlnita/foto-02", "Rezidence Vlnitá", "Prodáno", False, "Rezidence", "Vlnitá", ["Praha", "dokončeno", "všechny byty prodány"], "Dokončený dům, který nám ukázal, že detail rozhoduje. Zůstává jako naše vizitka.", "Prohlédnout", sold=True, widths=(600, 1200, 1800))}
-        </div>
+{cards}        </div>
       </div>
     </section>
 
@@ -811,56 +739,44 @@ def home_page():
     <section class="section" id="pristup" aria-labelledby="pristup-title">
       <div class="wrap" style="display:grid;gap:clamp(3rem,8vw,7rem)">
         <div>
-          <p class="eyebrow" data-reveal><span>03</span> Jak stavíme</p>
-          <h2 class="display display--md" id="pristup-title"><span class="mask"><span class="mask__in" data-in>Jednoduše,</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">poctivě, natrvalo.</span></span></h2>
+          <p class="eyebrow" data-reveal><span>03</span> {H['s3']}</p>
+          <h2 class="display display--md" id="pristup-title"><span class="mask"><span class="mask__in" data-in>{H['how_h'][0]}</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">{H['how_h'][1]}</span></span></h2>
         </div>
-        <div class="split" data-reveal>
-          <div class="split__media">{img(I('ke-schodum/bdks_10'), 'Zahrada Rezidence ke Schodům', sizes='(max-width: 880px) 100vw, 58vw')}</div>
-          <div class="split__copy"><h3>Každý byt má kus nebe.</h3><p>Zahrada, terasa nebo balkon. Nestavíme dům, kde se venku jen parkuje. Obytné místnosti míří na jih, do zeleně, a&nbsp;venkovní prostor počítáme jako další pokoj.</p></div>
-        </div>
-        <div class="split split--flip" data-reveal>
-          <div class="split__media">{img(I('do-ctvrti/bddc_int_01'), 'Interiér Rezidence Do Čtvrti', sizes='(max-width: 880px) 100vw, 58vw')}</div>
-          <div class="split__copy"><h3>Materiály, které stárnou krásně.</h3><p>Pohledový beton, dřevo, omítky v&nbsp;teplých tónech, cihla a&nbsp;sklo. Méně prvků, zato lepších. Nic, co se za pár let musí vyměnit.</p></div>
-        </div>
-        <div class="split" data-reveal>
-          <div class="split__media">{img(I('ke-schodum/bdks_18'), 'Detail fasády Rezidence ke Schodům', sizes='(max-width: 880px) 100vw, 58vw')}</div>
-          <div class="split__copy"><h3>Důvěra se staví stejně jako dům.</h3><p>Srozumitelné informace, jasné termíny a&nbsp;přímý kontakt na lidi, kteří za projektem stojí. Když se něco změní, dozvíte se to od nás jako první.</p></div>
-        </div>
-      </div>
+{hows}      </div>
     </section>
 
     <!-- ============ REFERENCE + PARTNEŘI ============ -->
     <section class="section dark" id="reference" aria-labelledby="ref-title">
       <div class="wrap">
-        <p class="eyebrow" data-reveal><span>04</span> Reference a partneři</p>
-        <h2 class="manifest" id="ref-title" data-reveal>Dva domy jsme už <strong>dokončili a&nbsp;předali</strong>. Dva další navrhujeme s&nbsp;ateliérem <strong>JA Architekti</strong>, který má za sebou desítky realizací.</h2>
+        <p class="eyebrow" data-reveal><span>04</span> {H['s4']}</p>
+        <h2 class="manifest" id="ref-title" data-reveal>{H['ref_manifest']}</h2>
         <div class="partners" data-reveal>
-          <div class="partners__item"><small>Architektura obou pražských projektů</small><img src="assets/img/partners/ja-architekti.svg" alt="JA Architekti" style="height:2rem;width:auto;filter:invert(1)"></div>
-          <div class="partners__item"><small>Prodej Apartmánů Vysoké</small><strong>Svoboda <span>&amp;</span> Williams</strong></div>
+          <div class="partners__item"><small>{H['partner_arch']}</small><img src="{rel}assets/img/partners/ja-architekti.svg" alt="JA Architekti" style="height:2rem;width:auto;filter:invert(1)"></div>
+          <div class="partners__item"><small>{H['partner_sales']}</small><strong>Svoboda <span>&amp;</span> Williams</strong></div>
         </div>
         <div class="pgrid" style="margin-top:clamp(2.5rem,5vw,4rem)">
-          <a class="pcard2" href="apartmany-vysoke/" data-reveal>
-            <div class="pcard2__media">{img(I('vysoke/foto-14'), 'Apartmány Vysoké v zimě', (600, 1200, 1800), '(max-width: 880px) 100vw, 50vw')}</div>
-            <div class="pcard2__body"><h3 class="pcard2__title">Apartmány <span class="light">Vysoké</span></h3><p class="pcard2__text">Dokončeno. Dva horské domy, zahrada s&nbsp;jezírkem, výhled na Krkonoše.</p><span class="pcard2__cta">Prohlédnout <i aria-hidden="true">→</i></span></div>
-          </a>
-          <a class="pcard2 pcard2--sold" href="rezidence-vlnita/" data-reveal style="--d:.1s">
-            <div class="pcard2__media">{img(I('vlnita/foto-13'), 'Obývací pokoj Rezidence Vlnitá', (600, 1200, 1800), '(max-width: 880px) 100vw, 50vw')}</div>
-            <div class="pcard2__body"><h3 class="pcard2__title">Rezidence <span class="light">Vlnitá</span></h3><p class="pcard2__text">Dokončeno a&nbsp;prodáno. Čisté linie, tmavé dřevo a&nbsp;světlo.</p><span class="pcard2__cta">Prohlédnout <i aria-hidden="true">→</i></span></div>
-          </a>
-        </div>
+{refs}        </div>
       </div>
     </section>
 
-{form("Nico & Kai Development", False, False, ("Chcete vědět", "jako první?"), "Zanechte nám kontakt. Ozveme se, jakmile budeme mít k&nbsp;projektům další informace, a&nbsp;rádi vás provedeme výběrem bytu.", (), "Odeslat", eyebrow=("05", "Kontakt"), rel="").replace('id="rezervace"', 'id="kontakt"')}
+{form(C, "Nico & Kai Development", False, False, H['form_h'], H['form_lead'], (), T['send'], eyebrow=("05", H['s5'])).replace('id="rezervace"', 'id="kontakt"')}
 """
-    html += footer(rel, "company") + scripts(rel, ())
+    html += footer(C, "company") + scripts(C, ())
     return html
 
-pages = {"index.html": home_page(), "ke-schodum/index.html": project_page(KS), "do-ctvrti/index.html": project_page(DC),
-         "apartmany-vysoke/index.html": vysoke_page(), "rezidence-vlnita/index.html": vlnita_page(),
-         "ochrana-osobnich-udaju/index.html": legal_page(), "404.html": notfound_page(),
-         "sitemap.xml": sitemap_xml(), "robots.txt": f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n"}
+# ======================================================================
+# VÝSTUP
+# ======================================================================
+pages = {"404.html": notfound_page(), "sitemap.xml": sitemap_xml(), "robots.txt": f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n"}
+for lang in LANGS:
+    pre = LANG_META[lang]["prefix"]
+    pages[f"{pre}index.html"] = home_page(Ctx(lang, "home"))
+    pages[f"{pre}ke-schodum/index.html"] = project_page(Ctx(lang, "ke-schodum"), PROJECTS[lang]["ks"])
+    pages[f"{pre}do-ctvrti/index.html"] = project_page(Ctx(lang, "do-ctvrti"), PROJECTS[lang]["dc"])
+    pages[f"{pre}apartmany-vysoke/index.html"] = vysoke_page(Ctx(lang, "vysoke"))
+    pages[f"{pre}rezidence-vlnita/index.html"] = vlnita_page(Ctx(lang, "vlnita"))
+    pages[f"{pre}{LANG_META[lang]['privacy']}/index.html"] = legal_page(Ctx(lang, "privacy"))
 for rel, html in pages.items():
-    path = os.path.join(ROOT, rel); os.makedirs(os.path.dirname(path), exist_ok=True)
+    path = os.path.join(ROOT, rel); os.makedirs(os.path.dirname(path) or ROOT, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f: f.write(html)
     print("wrote", rel, len(html))

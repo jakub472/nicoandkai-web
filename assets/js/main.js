@@ -5,6 +5,9 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const cfg = window.NK_CONFIG || { company: {} };
+  const tr = (k) => { const key = String(k).replace(/\u00a0/g, ' '); return (window.NK_DICT && Object.prototype.hasOwnProperty.call(window.NK_DICT, key)) ? window.NK_DICT[key] : k; };
+  const tpl = (k, vars) => tr(k).replace(/\{(\w+)\}/g, (m, v) => (v in vars ? vars[v] : m));
+  const LOC = window.NK_LOCALE || 'cs-CZ';
   const getCfg = (path) => path.split('.').reduce((o, k) => (o ? o[k] : undefined), cfg);
 
   /* ---------- config → DOM (prázdné hodnoty se skryjí) ---------- */
@@ -19,13 +22,15 @@
   $$('[data-year]').forEach((el) => { el.textContent = new Date().getFullYear(); });
 
   /* ---------- česká typografie: jednopísmenné předložky nezůstanou na konci řádku ---------- */
-  const nbspRe = /(^|[\s(„])([ksvzouaiKSVZOUAI])\s+(?=\S)/g;
-  const walker = document.createTreeWalker($('main'), NodeFilter.SHOW_TEXT, {
-    acceptNode: (n) => (n.parentElement.closest('script,style,textarea,option') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
-  });
-  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-    const t = n.nodeValue.replace(nbspRe, '$1$2 ').replace(nbspRe, '$1$2 ');
-    if (t !== n.nodeValue) n.nodeValue = t;
+  if (document.documentElement.lang === 'cs') {
+    const nbspRe = /(^|[\s(„])([ksvzouaiKSVZOUAI])\s+(?=\S)/g;
+    const walker = document.createTreeWalker($('main'), NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement.closest('script,style,textarea,option') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const t = n.nodeValue.replace(nbspRe, '$1$2 ').replace(nbspRe, '$1$2 ');
+      if (t !== n.nodeValue) n.nodeValue = t;
+    }
   }
 
   /* ---------- hlavička: schovat při scrollu dolů, progress, aktivní odkaz ---------- */
@@ -75,7 +80,7 @@
   /* ---------- mobilní menu ---------- */
   const setMenu = (open) => {
     menuBtn.setAttribute('aria-expanded', String(open));
-    menuBtn.querySelector('.menu-btn__label').textContent = open ? 'Zavřít' : 'Menu';
+    menuBtn.querySelector('.menu-btn__label').textContent = open ? tr('Zavřít') : tr('Menu');
     menu.hidden = !open;
     document.body.style.overflow = open ? 'hidden' : '';
     header.classList.remove('is-hidden');
@@ -130,9 +135,9 @@
       const { name, email, consent } = form.elements;
       const bad = [];
       const nOk = !!name.value.trim();
-      setError(name, !nOk, 'Napište prosím své jméno.'); if (!nOk) bad.push(name);
+      setError(name, !nOk, tr('Napište prosím své jméno.')); if (!nOk) bad.push(name);
       const eOk = emailOk(email.value.trim());
-      setError(email, !eOk, 'Zadejte prosím platný e-mail.'); if (!eOk) bad.push(email);
+      setError(email, !eOk, tr('Zadejte prosím platný e-mail.')); if (!eOk) bad.push(email);
       setError(consent, !consent.checked, ''); if (!consent.checked) bad.push(consent);
       return bad;
     };
@@ -144,7 +149,7 @@
       const bad = validate();
       if (bad.length) {
         bad[0].focus();
-        status.textContent = bad[0] === form.elements.consent ? 'Pro odeslání potvrďte prosím souhlas.' : '';
+        status.textContent = bad[0] === form.elements.consent ? tr('Pro odeslání potvrďte prosím souhlas.') : '';
         return;
       }
       if (form.elements.website.value) return; // honeypot
@@ -165,25 +170,25 @@
           if (!res.ok) throw new Error(String(res.status));
           form.reset();
           $$('.is-invalid', form).forEach((n) => n.classList.remove('is-invalid'));
-          status.textContent = 'Děkujeme, vaše žádost byla odeslána. Brzy se vám ozveme.';
+          status.textContent = tr('Děkujeme, vaše žádost byla odeslána. Brzy se vám ozveme.');
         } catch {
-          status.textContent = 'Odeslání se nezdařilo. Zkuste to prosím znovu.';
+          status.textContent = tr('Odeslání se nezdařilo. Zkuste to prosím znovu.');
         } finally {
           btn.disabled = false;
         }
       } else if (cfg.company && cfg.company.email) {
         const lines = [
-          `Projekt: ${project}`,
-          data.unit ? `Byt: ${data.unit}` : null,
-          data.parking ? 'Zájem o garážové stání: ano' : null,
-          data.cellar ? 'Zájem o sklep: ano' : null,
-          `Jméno: ${data.name}`, `E-mail: ${data.email}`, `Telefon: ${data.phone || '-'}`, '', data.message || '',
+          `${tr('Projekt:')} ${project}`,
+          data.unit ? `${tr('Byt:')} ${data.unit}` : null,
+          data.parking ? tr('Zájem o garážové stání: ano') : null,
+          data.cellar ? tr('Zájem o sklep: ano') : null,
+          `${tr('Jméno:')} ${data.name}`, `${tr('E-mail:')} ${data.email}`, `${tr('Telefon:')} ${data.phone || '-'}`, '', data.message || '',
         ].filter((l) => l !== null);
-        location.href = `mailto:${cfg.company.email}?subject=${encodeURIComponent(`Zájem: ${project}${data.unit ? ' – byt ' + data.unit : ''}`)}&body=${encodeURIComponent(lines.join('\n'))}`;
-        status.textContent = 'Otevíráme váš e-mailový program…';
+        location.href = `mailto:${cfg.company.email}?subject=${encodeURIComponent(`${tpl('Zájem: {project}', { project })}${data.unit ? tr(' – byt ') + data.unit : ''}`)}&body=${encodeURIComponent(lines.join('\n'))}`;
+        status.textContent = tr('Otevíráme váš e-mailový program…');
       } else {
         // Formulář ještě není napojený (viz assets/js/config.js).
-        status.textContent = 'Formulář zatím není napojen na příjem zpráv.';
+        status.textContent = tr('Formulář zatím není napojen na příjem zpráv.');
         console.warn('[Nico & Kai] Nastavte NK_CONFIG.formEndpoint nebo NK_CONFIG.company.email v assets/js/config.js.');
       }
     });

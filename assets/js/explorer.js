@@ -9,16 +9,20 @@
   if (!P) { console.warn('[explorer] chybí data projektu', root.dataset.explorer); return; }
 
   const CFG = window.NK_CONFIG || {};
+  const tr = (k) => { const key = String(k).replace(/\u00a0/g, ' '); return (window.NK_DICT && Object.prototype.hasOwnProperty.call(window.NK_DICT, key)) ? window.NK_DICT[key] : k; };
+  const tpl = (k, vars) => tr(k).replace(/\{(\w+)\}/g, (m, v) => (v in vars ? vars[v] : m));
+  const LOC = window.NK_LOCALE || 'cs-CZ';
   const priceMode = CFG.priceMode || 'public';           // 'public' | 'total' | 'onRequest'
   const imgBase = root.dataset.imgBase || '';
   const NS = 'http://www.w3.org/2000/svg';
 
   const $ = (s, r = root) => r.querySelector(s);
   const $$ = (s, r = root) => [...r.querySelectorAll(s)];
-  const nf = new Intl.NumberFormat('cs-CZ');
-  const nfa = new Intl.NumberFormat('cs-CZ', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+  const nf = new Intl.NumberFormat(LOC);
+  const nfa = new Intl.NumberFormat(LOC, { minimumFractionDigits: 1, maximumFractionDigits: 2 });
   const area = (v) => `${nfa.format(v)} m²`;
-  const STATUS = { available: 'Volný', reserved: 'Rezervovaný', sold: 'Prodaný' };
+  const CUR = tr('Kč');
+  const STATUS = { available: tr('Volný'), reserved: tr('Rezervovaný'), sold: tr('Prodaný') };
 
   const el = (tag, attrs = {}, parent) => {
     const n = document.createElementNS(NS, tag);
@@ -36,9 +40,9 @@
   /* ---------- ceny ---------- */
   function priceInfo(u) {
     if (u.status !== 'available') return { main: STATUS[u.status], sub: '' };
-    if (u.price == null || priceMode === 'onRequest') return { main: 'Cena na vyžádání', sub: '' };
-    const sub = priceMode === 'public' ? `${nf.format(Math.round(u.price / u.area))} Kč/m²` : '';
-    return { main: `${nf.format(u.price)} Kč`, sub };
+    if (u.price == null || priceMode === 'onRequest') return { main: tr('Cena na vyžádání'), sub: '' };
+    const sub = priceMode === 'public' ? `${nf.format(Math.round(u.price / u.area))} ${CUR}/m²` : '';
+    return { main: `${nf.format(u.price)} ${CUR}`, sub };
   }
 
   /* ---------- axonometrie z obrysů skutečných půdorysů ---------- */
@@ -84,7 +88,7 @@
 
     [...P.floors].map((f, i) => [f, planFor(i)]).reverse().forEach(([f, pl]) => {   // odspodu nahoru (horní se kreslí naposled)
       if (!pl) return;
-      const fg = el('g', { class: 'sf', 'data-floor': f.id, tabindex: 0, role: 'button', 'aria-label': `Zobrazit ${f.long}` }, world);
+      const fg = el('g', { class: 'sf', 'data-floor': f.id, tabindex: 0, role: 'button', 'aria-label': `${tr('Zobrazit')} ${tr(f.long)}` }, world);
       const O = polyM(pl, pl.outline);
       const own = P.plans && P.plans[f.id] && P.plans[f.id].outline ? P.plans[f.id] : null;
       if (f.type === 'basement' || !own) {
@@ -112,7 +116,7 @@
       const xs = O.map((p) => p[0]), ys = O.map((p) => p[1]);
       const [lx, ly] = iso(Math.max(...xs), (Math.min(...ys) + Math.max(...ys)) / 2, f.z);
       const lab = el('text', { class: 'sf-label', x: (lx + 14).toFixed(1), y: (ly + 4).toFixed(1) }, fg);
-      lab.textContent = f.label;
+      lab.textContent = tr(f.label);
       bb.x1 = Math.max(bb.x1, lx + 60);
     });
 
@@ -131,7 +135,7 @@
   function buildImagePlan(svg, f, pl) {
     const [W, H] = pl.size;
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    svg.setAttribute('aria-label', `Půdorys – ${f.long}`);
+    svg.setAttribute('aria-label', tpl('Půdorys – {f}', { f: tr(f.long) }));
     svg.classList.add('is-image');
     const defs = el('defs', {}, svg);
     const pat = el('pattern', { id: 'hatch-i', width: 22, height: 22, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
@@ -143,7 +147,7 @@
       const grp = el('g', {
         class: `pu pz st-${u.status}` + (state.unit === id ? ' is-selected' : ''),
         'data-unit': id, tabindex: 0, role: 'button', 'aria-pressed': state.unit === id,
-        'aria-label': `Byt ${id}, ${u.disposition}, ${area(u.areaNV || u.area)}, ${STATUS[u.status]}`,
+        'aria-label': `${tr('Byt')} ${id}, ${u.disposition}, ${area(u.areaNV || u.area)}, ${STATUS[u.status]}`,
       }, svg);
       el('polygon', { class: 'pz-shape', points: ptsAttr(pts) }, grp);
       el('polygon', { class: 'pz-hatch', points: ptsAttr(pts) }, grp);
@@ -166,11 +170,11 @@
     const pl = P.plans && P.plans[f.id];
     const note = $('#ex-note');
     if (pl && pl.image) {
-      if (note) note.textContent = P.planNote || 'Půdorys z projektové dokumentace.';
+      if (note) note.textContent = P.planNote ? tr(P.planNote) : tr('Půdorys z projektové dokumentace.');
       return buildImagePlan(svg, f, pl);
     }
     svg.setAttribute('viewBox', '0 0 100 20');
-    if (note) note.textContent = 'Půdorys tohoto podlaží doplníme.';
+    if (note) note.textContent = tr('Půdorys tohoto podlaží doplníme.');
   }
 
   /* ---------- patra (tlačítka) ---------- */
@@ -179,14 +183,14 @@
     ul.innerHTML = '';
     P.floors.forEach((f) => {
       let meta;
-      if (f.type === 'basement') meta = f.meta;
+      if (f.type === 'basement') meta = tr(f.meta);
       else {
         const us = P.units.filter((u) => u.floor === f.id);
         const free = us.filter((u) => u.status === 'available').length;
-        meta = `${us.length} ${us.length === 1 ? 'byt' : us.length < 5 ? 'byty' : 'bytů'} · ${free} volné`;
+        meta = `${us.length} ${tr(us.length === 1 ? 'byt' : us.length < 5 ? 'byty' : 'bytů')} · ${free} ${tr('volné')}`;
       }
       const li = document.createElement('li');
-      li.innerHTML = html`<button type="button" role="tab" data-floor="${f.id}" aria-selected="false"><strong>${f.label}</strong><small>${meta}</small></button>`;
+      li.innerHTML = html`<button type="button" role="tab" data-floor="${f.id}" aria-selected="false"><strong>${tr(f.label)}</strong><small>${meta}</small></button>`;
       ul.appendChild(li);
     });
   }
@@ -198,11 +202,11 @@
 
     if (f.type === 'basement') {
       d.innerHTML = html`
-        <div class="detail__head"><h3>${f.title}</h3><span class="badge">${f.label}</span></div>
-        <dl class="stats">${f.stats.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
-        <p class="detail__text">${f.text}</p>
-        ${f.priceNote ? `<p class="detail__price"><strong>${esc(f.priceNote[0])}</strong><span>${esc(f.priceNote[1])}</span></p>` : ''}
-        ${f.cta ? `<div class="detail__actions"><button class="btn" type="button" data-reserve-extra>${esc(f.cta)} <i class="arrow" aria-hidden="true">→</i></button></div>` : ''}`;
+        <div class="detail__head"><h3>${tr(f.title)}</h3><span class="badge">${tr(f.label)}</span></div>
+        <dl class="stats">${f.stats.map(([k, v]) => `<div><dt>${esc(tr(k))}</dt><dd>${esc(tr(v))}</dd></div>`).join('')}</dl>
+        <p class="detail__text">${tr(f.text)}</p>
+        ${f.priceNote ? `<p class="detail__price"><strong>${esc(tr(f.priceNote[0]))}</strong><span>${esc(tr(f.priceNote[1]))}</span></p>` : ''}
+        ${f.cta ? `<div class="detail__actions"><button class="btn" type="button" data-reserve-extra>${esc(tr(f.cta))} <i class="arrow" aria-hidden="true">→</i></button></div>` : ''}`;
       return;
     }
 
@@ -210,9 +214,9 @@
     if (!u) {
       const us = P.units.filter((x) => x.floor === f.id);
       d.innerHTML = html`
-        <div class="detail__head"><h3>${f.long}</h3></div>
-        <p class="detail__text">Vyberte byt v&nbsp;půdorysu nebo v&nbsp;přehledu níže.</p>
-        <ul class="detail__list">${us.map((x) => `<li><button type="button" data-unit="${x.id}"><strong>Byt ${x.id}</strong><span>${x.disposition} · ${area(x.areaNV || x.area)}</span><em class="tag tag--${x.status}">${STATUS[x.status]}</em></button></li>`).join('')}</ul>`;
+        <div class="detail__head"><h3>${tr(f.long)}</h3></div>
+        <p class="detail__text">${tr('Vyberte byt v&nbsp;půdorysu nebo v&nbsp;přehledu níže.')}</p>
+        <ul class="detail__list">${us.map((x) => `<li><button type="button" data-unit="${x.id}"><strong>${tr('Byt')} ${x.id}</strong><span>${x.disposition} · ${area(x.areaNV || x.area)}</span><em class="tag tag--${x.status}">${STATUS[x.status]}</em></button></li>`).join('')}</ul>`;
       return;
     }
 
@@ -225,38 +229,38 @@
       const b = zoneBox(zone);
       const dim = `M${b.x} ${b.y}h${b.w}v${b.h}h${-b.w}Z M${zone.map((p) => p.join(' ')).join(' L')}Z`;
       figure = html`<figure class="unitplan">
-        <svg viewBox="${b.x} ${b.y} ${b.w} ${b.h}" role="img" aria-label="Půdorys bytu ${u.id}">
+        <svg viewBox="${b.x} ${b.y} ${b.w} ${b.h}" role="img" aria-label="${tr('Byt')} ${u.id}">
           <image href="${imgBase + pl.image}" x="0" y="0" width="${pl.size[0]}" height="${pl.size[1]}"/>
           <path class="unitplan__dim" fill-rule="evenodd" d="${dim}"/>
           <polygon class="unitplan__line" points="${ptsAttr(zone)}"/>
         </svg>
-        <figcaption>Půdorys bytu ${u.id}</figcaption>
+        <figcaption>${tr('Byt')} ${u.id}</figcaption>
       </figure>`;
     }
-    const outdoorLabel = u.terrace != null ? (u.outdoorLabel || 'Terasa') : 'Venkovní prostor';
-    const outdoorVal = u.terrace != null ? area(u.terrace) : esc(u.outdoor || '–');
+    const outdoorLabel = u.terrace != null ? tr(u.outdoorLabel || 'Terasa') : tr('Venkovní prostor');
+    const outdoorVal = u.terrace != null ? area(u.terrace) : esc(u.outdoor ? tr(u.outdoor) : '–');
     d.innerHTML = html`
-      <div class="detail__head"><h3>Byt ${u.id}</h3><span class="tag tag--${u.status}">${STATUS[u.status]}</span></div>
+      <div class="detail__head"><h3>${tr('Byt')} ${u.id}</h3><span class="tag tag--${u.status}">${STATUS[u.status]}</span></div>
       <div class="detail__body${figure ? ' has-plan' : ''}">
         <div class="detail__info">
           <dl class="stats">
-            <div><dt>Dispozice</dt><dd>${u.disposition}</dd></div>
-            <div><dt>Podlaží</dt><dd>${floorById[u.floor].label}</dd></div>
-            <div><dt>${u.areaNV ? 'Plocha dle NV 366/2013' : 'Součet místností'}</dt><dd>${area(u.areaNV || u.area)}</dd></div>
+            <div><dt>${tr('Dispozice')}</dt><dd>${u.disposition}</dd></div>
+            <div><dt>${tr('Podlaží')}</dt><dd>${tr(floorById[u.floor].label)}</dd></div>
+            <div><dt>${tr(u.areaNV ? 'Plocha dle NV 366/2013' : 'Součet místností')}</dt><dd>${area(u.areaNV || u.area)}</dd></div>
             <div><dt>${outdoorLabel}</dt><dd>${outdoorVal}</dd></div>
           </dl>
-          ${u.total != null ? `<p class="detail__total"><span>Celkem včetně venkovního prostoru</span><strong>${area(u.total)}</strong></p>` : ''}
-          <p class="detail__price"><strong>${pr.main}</strong>${pr.sub ? `<span>${pr.sub}</span>` : (canReserve && pr.main === 'Cena na vyžádání' ? `<span><button class="link" type="button" data-reserve="${u.id}">Vyžádat ceník</button></span>` : '')}</p>
-          ${P.reservation && canReserve && u.price != null && priceMode !== 'onRequest' ? (() => { const [dep, disc] = P.reservation.tiers[P.reservation.tiers.length - 1]; return `<p class="detail__text detail__res">Při rezervaci se zálohou ${nf.format(dep / 1e6)} mil. Kč v&nbsp;průběhu stavebního řízení: sleva ${nf.format(disc * 100)} %, cena <strong>${nf.format(Math.round(u.price * (1 - disc) / 1000) * 1000)} Kč</strong>. <a href="#rezervace">Podmínky rezervace</a></p>`; })() : ''}
-          <p class="detail__text">${u.terraceNote ? u.terraceNote[0].toUpperCase() + u.terraceNote.slice(1) + '. ' : ''}${P.accessoriesNote || ''}</p>
-          <details class="rooms" open><summary>Místnosti</summary>
-            <table><tbody>${u.rooms.map(([n, a]) => `<tr><th scope="row">${esc(n)}</th><td>${area(a)}</td></tr>`).join('')}</tbody><tfoot><tr><th scope="row">Součet místností</th><td>${area(Math.round(u.rooms.reduce((t, r) => t + r[1], 0) * 100) / 100)}</td></tr></tfoot></table>
+          ${u.total != null ? `<p class="detail__total"><span>${tr('Celkem včetně venkovního prostoru')}</span><strong>${area(u.total)}</strong></p>` : ''}
+          <p class="detail__price"><strong>${pr.main}</strong>${pr.sub ? `<span>${pr.sub}</span>` : (canReserve && pr.main === tr('Cena na vyžádání') ? `<span><button class="link" type="button" data-reserve="${u.id}">${tr('Vyžádat ceník')}</button></span>` : '')}</p>
+          ${P.reservation && canReserve && u.price != null && priceMode !== 'onRequest' ? (() => { const [dep, disc] = P.reservation.tiers[P.reservation.tiers.length - 1]; return `<p class="detail__text detail__res">${tpl('Při rezervaci se zálohou {dep} mil. Kč v&nbsp;průběhu stavebního řízení: sleva {disc} %, cena <strong>{price}</strong>. <a href="#rezervace">Podmínky rezervace</a>', { dep: nf.format(dep / 1e6), disc: nf.format(disc * 100), price: `${nf.format(Math.round(u.price * (1 - disc) / 1000) * 1000)} ${CUR}` })}</p>`; })() : ''}
+          <p class="detail__text">${u.terraceNote ? (() => { const t = tr(u.terraceNote); return t[0].toUpperCase() + t.slice(1) + '. '; })() : ''}${P.accessoriesNote ? tr(P.accessoriesNote) : ''}</p>
+          <details class="rooms" open><summary>${tr('Místnosti')}</summary>
+            <table><tbody>${u.rooms.map(([n, a]) => `<tr><th scope="row">${esc(tr(n))}</th><td>${area(a)}</td></tr>`).join('')}</tbody><tfoot><tr><th scope="row">${tr('Součet místností')}</th><td>${area(Math.round(u.rooms.reduce((t, r) => t + r[1], 0) * 100) / 100)}</td></tr></tfoot></table>
           </details>
           <div class="detail__actions">
             ${canReserve
-              ? html`<button class="btn" type="button" data-reserve="${u.id}">${priceMode === 'onRequest' ? 'Mám zájem o byt' : ((P.cta && P.cta.unit) || 'Rezervovat byt')} ${u.id} <i class="arrow" aria-hidden="true">→</i></button>`
-              : html`<p class="detail__text">Tento byt už není k&nbsp;dispozici. Napište nám a dáme vám vědět o&nbsp;podobných bytech.</p><a class="btn btn--ghost" href="#rezervace" data-reserve="">Napsat nám</a>`}
-            <button class="btn btn--ghost" type="button" data-cad>Celé podlaží</button>
+              ? html`<button class="btn" type="button" data-reserve="${u.id}">${priceMode === 'onRequest' ? tr('Mám zájem o byt') : tr((P.cta && P.cta.unit) || 'Rezervovat byt')} ${u.id} <i class="arrow" aria-hidden="true">→</i></button>`
+              : html`<p class="detail__text">${tr('Tento byt už není k&nbsp;dispozici. Napište nám a dáme vám vědět o&nbsp;podobných bytech.')}</p><a class="btn btn--ghost" href="#rezervace" data-reserve="">${tr('Napsat nám')}</a>`}
+            <button class="btn btn--ghost" type="button" data-cad>${tr('Celé podlaží')}</button>
           </div>
         </div>
         ${figure}
@@ -270,27 +274,27 @@
     const hasTer = P.units.some((u) => u.terrace != null);
     const ths = $$('#ex-table thead th');
     const hasNV = P.units.some((u) => u.areaNV);
-    ths[3].textContent = hasNV ? 'Plocha (NV 366/2013)' : 'Součet místností';
-    ths[4].textContent = hasTer ? (P.outdoorHeader || 'Terasa') : 'Venkovní prostor';
+    ths[3].textContent = tr(hasNV ? 'Plocha (NV 366/2013)' : 'Součet místností');
+    ths[4].textContent = tr(hasTer ? (P.outdoorHeader || 'Terasa') : 'Venkovní prostor');
     ths[5].hidden = !hasTer;
     const showPrice = priceMode !== 'onRequest' && P.units.some((u) => u.price != null);
     ths[6].hidden = !showPrice;
     [...P.units].sort((a, b) => P.floors.indexOf(floorById[b.floor]) - P.floors.indexOf(floorById[a.floor]) || a.id.localeCompare(b.id)).forEach((u) => {
       const pr = priceInfo(u);
-      const tr = document.createElement('tr');
-      tr.dataset.unit = u.id;
-      tr.className = `st-${u.status}`;
-      tr.innerHTML = html`
+      const row = document.createElement('tr');
+      row.dataset.unit = u.id;
+      row.className = `st-${u.status}`;
+      row.innerHTML = html`
         <th scope="row">${u.id}</th>
-        <td>${floorById[u.floor].label}</td>
+        <td>${tr(floorById[u.floor].label)}</td>
         <td>${u.disposition}</td>
         <td>${area(u.areaNV || u.area)}</td>
-        <td>${hasTer ? (u.terrace != null ? area(u.terrace) : '–') : esc(u.outdoor || '–')}</td>
+        <td>${hasTer ? (u.terrace != null ? area(u.terrace) : '–') : esc(u.outdoor ? tr(u.outdoor) : '–')}</td>
         ${hasTer ? `<td>${u.total != null ? area(u.total) : '–'}</td>` : ''}
         ${showPrice ? `<td>${u.status === 'available' ? pr.main : '–'}</td>` : ''}
         <td><span class="tag tag--${u.status}">${STATUS[u.status]}</span></td>
-        <td><button type="button" class="link" data-unit="${u.id}" aria-label="Zobrazit byt ${u.id}">Detail →</button></td>`;
-      tb.appendChild(tr);
+        <td><button type="button" class="link" data-unit="${u.id}" aria-label="${tpl('Zobrazit byt {id}', { id: u.id })}">${tr('Detail →')}</button></td>`;
+      tb.appendChild(row);
     });
   }
 
@@ -303,7 +307,7 @@
     $('#ex-stack').classList.add('has-active');
     $$('.su', $('#ex-stack')).forEach((g) => g.classList.toggle('is-selected', g.dataset.unit === state.unit));
     $$('#ex-table tbody tr').forEach((tr) => tr.classList.toggle('is-selected', tr.dataset.unit === state.unit));
-    $('#ex-floor-title').textContent = floorById[state.floor].long;
+    $('#ex-floor-title').textContent = tr(floorById[state.floor].long);
     $('#ex-cad').hidden = !P.planImages[state.floor];
     document.dispatchEvent(new CustomEvent('nk:unit', { detail: { unit: state.unit, floor: state.floor } }));
   }
@@ -326,8 +330,8 @@
   function fillReservationForm() {
     const sel = document.querySelector('#rezervace select[name="unit"]');
     if (!sel) return;
-    sel.innerHTML = '<option value="">Zatím nevím / obecný dotaz</option>' +
-      P.units.filter((u) => u.status === 'available').map((u) => `<option value="${u.id}">Byt ${u.id} · ${u.disposition} · ${area(u.areaNV || u.area)}</option>`).join('');
+    sel.innerHTML = `<option value="">${tr('Zatím nevím / obecný dotaz')}</option>` +
+      P.units.filter((u) => u.status === 'available').map((u) => `<option value="${u.id}">${tr('Byt')} ${u.id} · ${u.disposition} · ${area(u.areaNV || u.area)}</option>`).join('');
   }
   function goReserve(unitId, extra) {
     const sec = document.querySelector('#rezervace');
@@ -345,8 +349,8 @@
     const file = P.planImages[state.floor];
     if (!file || !dlg) return;
     $('img', dlg).src = imgBase + file;
-    $('img', dlg).alt = `Půdorys ${floorById[state.floor].long} z projektové dokumentace`;
-    $('.dialog__title', dlg).textContent = floorById[state.floor].long;
+    $('img', dlg).alt = tpl('Půdorys {f} z projektové dokumentace', { f: tr(floorById[state.floor].long) });
+    $('.dialog__title', dlg).textContent = tr(floorById[state.floor].long);
     dlg.showModal();
   }
 
@@ -382,9 +386,9 @@
   /* ---------- poznámka k plochám ---------- */
   const areaNote = $('#ex-areanote');
   if (areaNote) {
-    areaNote.textContent = P.units.some((u) => u.areaNV)
+    areaNote.textContent = tr(P.units.some((u) => u.areaNV)
       ? 'Plocha bytu je podlahová plocha podle nařízení vlády č. 366/2013 Sb. (včetně příček), orientační odhad z půdorysů. Závazná plocha bude v prohlášení vlastníka. Součet místností je v detailu bytu. Sklepy nejsou součástí plochy bytu.'
-      : 'Plochy jsou součtem místností podle projektové dokumentace. Podlahová plocha podle nařízení vlády č. 366/2013 Sb. (včetně příček a konstrukcí uvnitř bytu) bude o několik procent větší. Doplníme ji po výpočtu architekta.';
+      : 'Plochy jsou součtem místností podle projektové dokumentace. Podlahová plocha podle nařízení vlády č. 366/2013 Sb. (včetně příček a konstrukcí uvnitř bytu) bude o několik procent větší. Doplníme ji po výpočtu architekta.');
   }
 
   window.NK_EXPLORER = { project: P.slug, selectUnit, selectFloor, state };
