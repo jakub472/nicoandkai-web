@@ -17,8 +17,10 @@ ochrana-osobnich-udaju/          zásady zpracování osobních údajů (odkaz z
 404.html, sitemap.xml, robots.txt
 assets/data/*.js                 DATA: byty, plochy, ceny (nyní null), stavy, zóny na fasádě, rezervační klíč
 assets/js/config.js              kontakty, prodávající, režim cen (priceMode), napojení formuláře
-assets/js/site.js                splash, hero, galerie + lightbox, interaktivní fasáda, ceník/rezervace
-assets/js/explorer.js            výběr bytu po patrech (axonometrie, půdorys, detail, tabulka)
+assets/js/site.js                splash, hero (obrázky / video), galerie + lightbox, interaktivní fasáda (reflektor), ceník/rezervace
+assets/js/explorer.js            výběr bytu po patrech (axonometrie z obrysů půdorysů, půdorys se zónami, detail, tabulka)
+assets/js/atmo.js                atmosféra v hero: mlha (Praha) / sníh (Vysoké) na canvasu; vypnuto při prefers-reduced-motion
+assets/video/                    hero videa (Veo 3.1 přes Figma Weave): <projekt>.mp4 1080p a <projekt>-720.mp4; src/ = výchozí snímky 16:9
 assets/css/site.css              komponenty webu; styles.css = základ a typografie; explorer.css = výběr bytů
 assets/img/<projekt>/            vizualizace a fotky ve 3 šířkách (600/1200/1800–2400 px, WebP)
 ```

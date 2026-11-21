@@ -26,16 +26,46 @@
     }
   }
 
-  /* ---------- hero: Ken Burns + prolínání ---------- */
+  /* ---------- hero: Ken Burns + prolínání obrázků, nebo video (Veo 3.1) ---------- */
+  const saveData = navigator.connection && navigator.connection.saveData;
+  const wantVideo = !reduce && !saveData && matchMedia('(min-width: 700px)').matches;
   $$('.hero-media').forEach((h) => {
     const slides = $$('.hero-media__bg.is-slides img', h);
+    const videos = $$('.hero-media__video', h);
     const start = () => h.classList.add('is-ready');
     const first = $('.hero-media__bg img', h);
     if (first && !first.complete) first.addEventListener('load', start, { once: true }); else start();
+    let imgTimer = null;
     if (slides.length > 1 && !reduce) {
       let i = 0; slides[0].classList.add('is-on');
-      setInterval(() => { slides[i].classList.remove('is-on'); i = (i + 1) % slides.length; slides[i].classList.add('is-on'); }, 7000);
+      imgTimer = setInterval(() => { slides[i].classList.remove('is-on'); i = (i + 1) % slides.length; slides[i].classList.add('is-on'); }, 7000);
     } else if (slides.length) slides[0].classList.add('is-on');
+
+    if (!videos.length || !wantVideo) return;
+    // videa: po načtení nahradí obrázky; víc videí se střídá s prolnutím, jedno se prolíná samo do sebe (bez švu)
+    const list = videos.length > 1 ? videos : [videos[0], videos[0].cloneNode(true)];
+    if (videos.length === 1) videos[0].after(list[1]);
+    const small = matchMedia('(max-width: 1100px)').matches;
+    list.forEach((v) => { v.src = (small && v.dataset.srcSm) || v.dataset.src; v.load(); });
+    let cur = 0, armed = false;
+    const play = (v) => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    const swap = () => {
+      const a = list[cur], b = list[(cur + 1) % list.length];
+      b.currentTime = 0; play(b); b.classList.add('is-on'); a.classList.remove('is-on');
+      setTimeout(() => { a.pause(); }, 1300);
+      cur = (cur + 1) % list.length;
+    };
+    list.forEach((v) => v.addEventListener('timeupdate', () => {
+      if (v !== list[cur] || !v.duration) return;
+      if (v.currentTime > v.duration - 1.1) swap();
+    }));
+    list[0].addEventListener('canplay', () => {
+      if (armed) return; armed = true;
+      if (imgTimer) clearInterval(imgTimer);
+      play(list[0]); list[0].classList.add('is-on'); h.classList.add('has-video');
+    }, { once: true });
+    list.forEach((v) => v.addEventListener('error', () => h.classList.remove('has-video')));
+    document.addEventListener('visibilitychange', () => { if (document.hidden) list.forEach((v) => v.pause()); else play(list[cur]); });
   });
 
   $$('.facade__img').forEach((img) => { if (img.complete) img.classList.add('is-loaded'); else img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true }); });

@@ -302,3 +302,8 @@ html.has-splash body { overflow: hidden; }
 /* ---------- atmosféra v hero (mlha / sníh) ---------- */
 .hero-media__atmo { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 2.5s ease 1s; }
 .hero-media.is-ready .hero-media__atmo.is-on { opacity: 1; }
+
+/* ---------- hero video ---------- */
+.hero-media__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.3s ease; pointer-events: none; }
+.hero-media.has-video .hero-media__video.is-on { opacity: 1; }
+.hero-media.has-video .hero-media__bg img { animation: none; }

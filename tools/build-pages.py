@@ -13,6 +13,12 @@ def img(path, alt, widths=(600, 1200, 2400), sizes="100vw", cls="", lazy=True, e
     return (f'<img{(" class=\"" + cls + "\"") if cls else ""} src="{base}-{mid}.webp" srcset="{srcset}" sizes="{sizes}" '
             f'data-full="{base}-{widths[-1]}.webp" alt="{alt}"{" loading=\"lazy\"" if lazy else " fetchpriority=\"high\""}{extra}>')
 
+def video(rel, name):
+    """Hero video (mp4 z Veo 3.1 / Figma Weave). Načte se až skriptem (data-src); na malých displejích
+    a při prefers-reduced-motion zůstane obrázek. 720p verze pro menší obrazovky."""
+    return (f'<video class="hero-media__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1" '
+            f'data-src="{rel}assets/video/{name}.mp4" data-src-sm="{rel}assets/video/{name}-720.mp4"></video>')
+
 def fig(path, alt, cap="", kind="", widths=(600, 1200, 2400)):
     sizes = "(max-width: 880px) 100vw, 66vw" if kind in ("is-wide", "is-big") else "(max-width: 880px) 100vw, 33vw"
     return f'<figure{(" class=\"" + kind + "\"") if kind else ""}>{img(path, alt, widths, sizes)}{("<figcaption>" + cap + "</figcaption>") if cap else ""}</figure>'
@@ -242,7 +248,7 @@ def project_page(c):
     html += f"""
     <!-- ============ HERO ============ -->
     <section class="hero-media dark" id="top" data-atmo="mist">
-      <div class="hero-media__bg">{img(I(c['hero']), c['hero_alt'], sizes="100vw", lazy=False)}</div>
+      <div class="hero-media__bg">{img(I(c['hero']), c['hero_alt'], sizes="100vw", lazy=False)}{video(rel, c['video']) if c.get('video') else ''}</div>
       <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
         <p class="chip" data-reveal><i aria-hidden="true"></i>{c['stage']} · stavební řízení zahájeno</p>
@@ -381,7 +387,7 @@ KS = dict(
     slug="ke-schodum", name="Rezidence ke Schodům", street="Ke Schodům", units=8,
     title="Rezidence ke Schodům | Nico &amp; Kai Development", og="og-ke-schodum.jpg",
     desc="Osm bytů s velkými terasami a zahradami v Praze-Modřanech. Pohledový beton, dřevo, tepelná čerpadla a fotovoltaika. Předprodej zahájen.",
-    hero="bdks_22", hero_alt="Rezidence ke Schodům – zahradní průčelí za soumraku", stage="Předprodej zahájen",
+    hero="bdks_22", hero_alt="Rezidence ke Schodům – zahradní průčelí za soumraku", stage="Předprodej zahájen", video="ke-schodum",
     h1a="Rezidence", h1b="ke&nbsp;Schodům",
     lead="Osm bytů, osm teras a&nbsp;zahrad. Dům v&nbsp;klidné části Modřan, kde se bydlí uvnitř i&nbsp;venku.",
     meta=[("Lokalita", "Praha-Modřany"), ("Byty", "8 · 2+kk a 3+kk"), ("Terasy", "19–104&nbsp;m²"), ("Dokončení", "2. čtvrtletí 2028")],
@@ -414,7 +420,7 @@ DC = dict(
     slug="do-ctvrti", name="Rezidence Do Čtvrti", street="Do čtvrti 1145/20", units=6,
     title="Rezidence Do Čtvrti | Nico &amp; Kai Development", og="og-do-ctvrti.jpg",
     desc="Šest bytů v nárožním domě v Praze-Modřanech. Zahrady, balkony a střešní terasy, garáž a sklepy. Předprodej zahájen.",
-    hero="bddc_01a", hero_alt="Rezidence Do Čtvrti – nárožní dům za soumraku", stage="Předprodej zahájen",
+    hero="bddc_01a", hero_alt="Rezidence Do Čtvrti – nárožní dům za soumraku", stage="Předprodej zahájen", video="do-ctvrti",
     h1a="Rezidence", h1b="Do&nbsp;Čtvrti",
     lead="Šest bytů v&nbsp;domě se zaoblenými rohy a&nbsp;fasádou z&nbsp;perforovaného zdiva. Vždy jen dva byty na podlaží.",
     meta=[("Lokalita", "Praha-Modřany"), ("Byty", "6 · 2+kk a 3+kk"), ("Venkovní prostory", "zahrady, balkony, terasy"), ("Souhlas IPR", "19. 10. 2026")],
@@ -747,8 +753,9 @@ def home_page():
     <!-- ============ HERO ============ -->
     <section class="hero-media dark" id="top" data-atmo="mist">
       <div class="hero-media__bg is-slides">
-        {img(I('ke-schodum/bdks_19'), 'Rezidence ke Schodům za soumraku', sizes='100vw', lazy=False)}
-        {img(I('do-ctvrti/bddc_01a'), 'Rezidence Do Čtvrti za soumraku', sizes='100vw')}
+        {img(I('do-ctvrti/bddc_01a'), 'Rezidence Do Čtvrti za soumraku', sizes='100vw', lazy=False)}
+        {img(I('ke-schodum/bdks_19'), 'Rezidence ke Schodům za soumraku', sizes='100vw')}
+        {video(rel, 'do-ctvrti')}{video(rel, 'ke-schodum')}
       </div>
       <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
