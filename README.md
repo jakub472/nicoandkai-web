@@ -78,4 +78,7 @@ Zóny bytů na fasádě (`facade.zones`) jsou v pixelech vizualizace 2528 × 169
 ## Zdroje
 - Ke Schodům: DSP 12/2025 (JA Architekti / Jakub Killnar), vizualizace JA Architekti (BDKS_*).
 - Do Čtvrti: DPZ 08/2026, studie 05/2026, souhlas IPR č. j. 12986/2026; vizualizace JA Architekti (BDDČ_*).
-- Vysoké: apartmanyvysoke.cz (B2 5+kk 193,1 m², fotky lokality), fotografie od zadavatele.
+- Vysoké: krajinné fotografie Jiří Smejkal (koupené, originály v iCloud Drive › Downloads › „Claude foto Vysoke“; na webu `k01`–`k11`),
+  interiéry a dům z nabídky Svoboda & Williams č. 115557 (svoboda-williams.com, apartmán A2; na webu `a01`–`a09`), dům v zimě z vlastního
+  prodejního podkladu (`d01`, `d02`). Pod galerií je uveden autor fotografií. Staré soubory `l*` a `foto-*` už web nepoužívá.
+- Vlnitá: fotografie od zadavatele (`foto-21`–`foto-25` z 23. 11. 2026; na `foto-24` je auto přebarvené na bílou a bez polepů).

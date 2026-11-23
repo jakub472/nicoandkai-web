@@ -34,7 +34,7 @@
       blobs = [];
       const n = Math.round(W / 180) + 5;
       for (let i = 0; i < n; i++) {
-        const r = rnd(W * 0.18, W * 0.42);
+        const r = Math.max(24, rnd(W * 0.18, W * 0.42));
         blobs.push({
           x: rnd(-r, W), y: rnd(H * 0.35, H * 1.05), r, sprite: blobSprite(Math.round(r), 235 + Math.round(rnd(0, 20))),
           vx: rnd(4, 11) * (Math.random() < .85 ? 1 : -1), vy: rnd(-1.2, 1.2),
@@ -90,6 +90,7 @@
     const resize = () => {
       const r = hero.getBoundingClientRect();
       W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+      if (W < 8 || H < 8) return;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       canvas.style.width = `${W}px`; canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -97,6 +98,7 @@
     };
     const frame = (now) => {
       if (!running) return;
+      if (W < 8 || H < 8) { resize(); raf = requestAnimationFrame(frame); return; }   // hero ještě nemá rozměr (skrytý panel)
       const t = now / 1000, dt = Math.min(.05, last ? (now - last) / 1000 : .016); last = now;
       if (mode === 'snow') drawSnow(t, dt); else drawMist(t, dt);
       raf = requestAnimationFrame(frame);

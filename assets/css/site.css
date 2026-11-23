@@ -318,3 +318,9 @@ html.has-splash body { overflow: hidden; }
 .lang--menu a { font-size: .875rem; padding: .5rem .6rem; }
 .lang--inline { display: inline-flex; margin-left: .25rem; vertical-align: middle; }
 @media (max-width: 880px) { .site-header__in > .lang { display: none; } }
+
+/* ---------- panorama (pomalý posun) ---------- */
+.pano { margin: clamp(2.5rem, 6vw, 5rem) 0 0; overflow: hidden; background: #111; }
+.pano img { display: block; width: 100%; height: clamp(220px, 34vw, 520px); object-fit: cover; object-position: 0% 50%; animation: nk-pano 60s ease-in-out infinite alternate; }
+@keyframes nk-pano { from { object-position: 0% 50%; } to { object-position: 100% 50%; } }
+@media (prefers-reduced-motion: reduce) { .pano img { animation: none; object-position: 50% 50%; } }

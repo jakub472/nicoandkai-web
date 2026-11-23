@@ -29,7 +29,17 @@ class Ctx:
         return self.rel + LANG_META[lang]["prefix"] + page_path(lang, self.key) or "./"
 
 # ---------------------------------------------------------------------- obrázky
-def img(path, alt, widths=(600, 1200, 2400), sizes="100vw", cls="", lazy=True, extra=""):
+def avail(path):
+    """Šířky, ve kterých obrázek na disku skutečně existuje (soubory <název>-<šířka>.webp)."""
+    p = path
+    while p.startswith("../"): p = p[3:]
+    base = os.path.join(ROOT, p.rsplit(".", 1)[0])
+    ws = tuple(w for w in (600, 1200, 1800, 2400, 3600) if os.path.exists(f"{base}-{w}.webp"))
+    assert ws, f"obrázek nenalezen: {path}"
+    return ws
+
+def img(path, alt, widths=None, sizes="100vw", cls="", lazy=True, extra=""):
+    widths = widths or avail(path)
     base = path.rsplit(".", 1)[0]
     srcset = ", ".join(f"{base}-{w}.webp {w}w" for w in widths)
     mid = widths[min(1, len(widths) - 1)]
@@ -42,7 +52,7 @@ def video(rel, name):
     return (f'<video class="hero-media__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1" '
             f'data-src="{rel}assets/video/{name}.mp4" data-src-sm="{rel}assets/video/{name}-720.mp4"></video>')
 
-def fig(path, alt, cap="", kind="", widths=(600, 1200, 2400)):
+def fig(path, alt, cap="", kind="", widths=None):
     sizes = "(max-width: 880px) 100vw, 66vw" if kind in ("is-wide", "is-big") else "(max-width: 880px) 100vw, 33vw"
     return f'<figure{(" class=\"" + kind + "\"") if kind else ""}>{img(path, alt, widths, sizes)}{("<figcaption>" + cap + "</figcaption>") if cap else ""}</figure>'
 
@@ -428,13 +438,13 @@ def project_page(C, c):
 # ======================================================================
 def vysoke_page(C):
     T, rel, V = C.T, C.rel, VYSOKE[C.lang]; I = lambda n: f"{rel}assets/img/vysoke/{n}.webp"
-    gal = "".join(fig(I(n), a, cap, k, widths=w) for n, a, cap, k, w in V['gallery'])
+    gal = "".join(fig(I(n), a, cap, k) for n, a, cap, k in V['gallery'])
     numbers = "".join(f'<div data-reveal style="--d:.{i}s"><strong><span data-count="{n}">{n}</span>{("<small>" + u + "</small>") if u else ""}</strong><span>{l}</span></div>' for i, (n, u, l) in enumerate(V['numbers']))
     html = head(C, V['title'], V['desc'], "og-vysoke.jpg")
     html += header(C, V['nav'], "#kontakt", V['cta_header'], V['nav'] + [(C.home or "./", T['all_projects'])])
     html += f"""
     <section class="hero-media dark" id="top" data-atmo="snow">
-      <div class="hero-media__bg">{img(I('l03'), V['hero_alt'], sizes='100vw', lazy=False)}</div>
+      <div class="hero-media__bg">{img(I('k01'), V['hero_alt'], sizes='100vw', lazy=False)}</div>
       <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
       <div class="wrap hero-media__body">
         <p class="chip" data-reveal><i aria-hidden="true"></i>{V['chip']}</p>
@@ -490,6 +500,7 @@ def vysoke_page(C):
           <p>{V['gal_p']}</p>
         </div>
         <div class="gallery" aria-label="{T['photos_aria']}">{gal}</div>
+        <p class="note" style="margin-top:1rem">{V['gal_note']}</p>
       </div>
     </section>
 
@@ -503,6 +514,7 @@ def vysoke_page(C):
           </div>
           <div class="addr__list" data-reveal>{"".join(f"<div><span>{k}</span><strong>{v}</strong></div>" for k, v in V['addr'])}</div>
         </div>
+        <figure class="pano" data-reveal>{img(I('k11'), V['pano_alt'], sizes='(max-width: 880px) 240vw, 150vw')}</figure>
       </div>
     </section>
 
@@ -652,7 +664,7 @@ def sitemap_xml():
 # ======================================================================
 def home_page(C):
     T, rel, H = C.T, C.rel, HOME[C.lang]; I = lambda p: f"{rel}assets/img/{p}.webp"
-    def card(href, image, alt, badge, live, title_a, title_b, meta, text, cta, sold=False, widths=(600, 1200, 2400)):
+    def card(href, image, alt, badge, live, title_a, title_b, meta, text, cta, sold=False, widths=None):
         return f"""          <a class="pcard2{' pcard2--sold' if sold else ''}" href="{C.home}{href}" data-reveal>
             <div class="pcard2__media"><span class="pcard2__badge{' is-live' if live else ''}{' is-sold' if sold else ''}"><i aria-hidden="true"></i>{badge}</span>{img(I(image), alt, widths, '(max-width: 880px) 100vw, 50vw')}</div>
             <div class="pcard2__body">
@@ -663,7 +675,7 @@ def home_page(C):
             </div>
           </a>
 """
-    cards = "".join(card(h, im, a, b, live, ta, tb, m, t, cta, sold, (600, 1200, 1800) if sold else (600, 1200, 2400)) for h, im, a, b, live, ta, tb, m, t, cta, sold in H['cards'])
+    cards = "".join(card(h, im, a, b, live, ta, tb, m, t, cta, sold) for h, im, a, b, live, ta, tb, m, t, cta, sold in H['cards'])
     numbers = "".join(f'<div data-reveal style="--d:.{i}s"><strong><span data-count="{n}">{n}</span>{("<small>" + u + "</small>") if u else ""}</strong><span>{l}</span></div>' for i, (n, u, l) in enumerate(H['numbers']))
     hows = ""
     for i, (im, a, h3, p) in enumerate(H['how']):
@@ -675,7 +687,7 @@ def home_page(C):
     refs = ""
     for i, (href, im, a, ta, tb, text, cta, sold) in enumerate(H['ref_cards']):
         refs += f"""          <a class="pcard2{' pcard2--sold' if sold else ''}" href="{C.home}{href}" data-reveal{' style="--d:.1s"' if i else ''}>
-            <div class="pcard2__media">{img(I(im), a, (600, 1200, 1800), '(max-width: 880px) 100vw, 50vw')}</div>
+            <div class="pcard2__media">{img(I(im), a, None, '(max-width: 880px) 100vw, 50vw')}</div>
             <div class="pcard2__body"><h3 class="pcard2__title">{ta} <span class="light">{tb}</span></h3><p class="pcard2__text">{text}</p><span class="pcard2__cta">{cta} <i aria-hidden="true">→</i></span></div>
           </a>
 """
