@@ -81,4 +81,7 @@ Zóny bytů na fasádě (`facade.zones`) jsou v pixelech vizualizace 2528 × 169
 - Vysoké: krajinné fotografie Jiří Smejkal (koupené, originály v iCloud Drive › Downloads › „Claude foto Vysoke“; na webu `k01`–`k11`),
   interiéry a dům z nabídky Svoboda & Williams č. 115557 (svoboda-williams.com, apartmán A2; na webu `a01`–`a09`), dům v zimě z vlastního
   prodejního podkladu (`d01`, `d02`). Pod galerií je uveden autor fotografií. Staré soubory `l*` a `foto-*` už web nepoužívá.
+  Exteriéry domu na webu jsou retušované verze (`e01` zahrada v podvečer, `e02` oba domy z příjezdu, `e03`/`e03w` zima v podvečer):
+  Figma Weave, Nano Banana Pro, 23. 11. 2026; měnila se obloha a světlo, zmizela hromada hlíny a kostek, dům je beze změny.
+  U `e02` je dlažba z původní fotky (model ji nahradil štěrkem, proto složeno ručně). Původní `a08`, `d01`, `d02` web nepoužívá.
 - Vlnitá: fotografie od zadavatele (`foto-21`–`foto-25` z 23. 11. 2026; na `foto-24` je auto přebarvené na bílou a bez polepů).
