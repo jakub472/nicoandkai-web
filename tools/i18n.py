@@ -449,7 +449,7 @@ VYSOKE = {
              ("k08", "Říčka Kamenice mezi balvany", "Kamenice", ""),
              ("k02", "Sjezdovka a hřebeny v ranním oparu, Paseky nad Jizerou", "Paseky nad Jizerou", "is-wide"),
              ("k09", "Rozhledna Maják Járy Cimrmana za svítání", "Rozhledna", "")],
-    gal_note="Krajinné fotografie: Jiří Smejkal. Fotografie apartmánu a domu: Svoboda &amp; Williams. Snímky exteriéru domu jsou retušované (obloha, světlo).", pano_alt="Letní krajina v okolí Vysokého nad Jizerou",
+    gal_note="Krajinné fotografie: Jiří Smejkal. Fotografie apartmánu a domu: Svoboda &amp; Williams. Snímky exteriéru jsou retušované a ilustrační: zahrada je zobrazena po dokončení úprav, hranice pozemku nejsou vyznačeny.", pano_alt="Letní krajina v okolí Vysokého nad Jizerou",
     s4="Lokalita", lok_h=("Vysoké", "nad Jizerou."),
     lok_p="Jedno z&nbsp;nejvýše položených měst v&nbsp;Česku na pomezí Krkonoš a&nbsp;Jizerských hor. Běžecké tratě, cyklotrasy, lyžařské vleky Šachty a&nbsp;Krakonošovo divadlo. Rokytnice a&nbsp;Harrachov za pár minut autem.",
     addr=[("Adresa", "K. Havlíčka Borovského 442/443, 512 11 Vysoké nad Jizerou"), ("Nadmořská výška", "cca 700 m n. m."), ("Zima", "běžecké tratě, vleky Šachty, Rokytnice, Harrachov"), ("Léto", "cyklotrasy, turistika, jezírko na zahradě"), ("Ve městě", "škola, nemocnice, pekárna, restaurace, divadlo")],
@@ -486,7 +486,7 @@ VYSOKE = {
              ("k08", "The Kamenice stream among boulders", "Kamenice", ""),
              ("k02", "Ski slope and ridges in the morning haze, Paseky nad Jizerou", "Paseky nad Jizerou", "is-wide"),
              ("k09", "The Jára Cimrman Lighthouse lookout tower at dawn", "Lookout tower", "")],
-    gal_note="Landscape photography: Jiří Smejkal. Photographs of the apartment and house: Svoboda &amp; Williams. Exterior photographs of the house are retouched (sky, light).", pano_alt="Summer landscape around Vysoké nad Jizerou",
+    gal_note="Landscape photography: Jiří Smejkal. Photographs of the apartment and house: Svoboda &amp; Williams. Exterior photographs are retouched and illustrative: the garden is shown after landscaping, plot boundaries are not marked.", pano_alt="Summer landscape around Vysoké nad Jizerou",
     s4="Location", lok_h=("Vysoké", "nad Jizerou."),
     lok_p="One of the highest-lying towns in the Czech Republic, between the Giant Mountains and the Jizera Mountains. Cross-country trails, cycle routes, the Šachty ski lifts and the Krakonoš theatre. Rokytnice and Harrachov a few minutes by car.",
     addr=[("Address", "K. Havlíčka Borovského 442/443, 512 11 Vysoké nad Jizerou"), ("Altitude", "approx. 700 m a.s.l."), ("Winter", "cross-country trails, Šachty lifts, Rokytnice, Harrachov"), ("Summer", "cycle routes, hiking, the garden pond"), ("In town", "school, hospital, bakery, restaurants, theatre")],
@@ -523,7 +523,7 @@ VYSOKE = {
              ("k08", "Der Fluss Kamenice zwischen Felsblöcken", "Kamenice", ""),
              ("k02", "Skipiste und Bergkämme im Morgendunst, Paseky nad Jizerou", "Paseky nad Jizerou", "is-wide"),
              ("k09", "Aussichtsturm „Leuchtturm von Jára Cimrman“ in der Morgendämmerung", "Aussichtsturm", "")],
-    gal_note="Landschaftsfotografie: Jiří Smejkal. Fotos des Apartments und des Hauses: Svoboda &amp; Williams. Die Außenaufnahmen des Hauses sind retuschiert (Himmel, Licht).", pano_alt="Sommerliche Landschaft rund um Vysoké nad Jizerou",
+    gal_note="Landschaftsfotografie: Jiří Smejkal. Fotos des Apartments und des Hauses: Svoboda &amp; Williams. Die Außenaufnahmen sind retuschiert und illustrativ: der Garten ist nach Fertigstellung dargestellt, Grundstücksgrenzen sind nicht eingezeichnet.", pano_alt="Sommerliche Landschaft rund um Vysoké nad Jizerou",
     s4="Lage", lok_h=("Vysoké", "nad Jizerou."),
     lok_p="Eine der höchstgelegenen Städte Tschechiens an der Grenze zwischen Riesengebirge und Isergebirge. Loipen, Radwege, die Skilifte Šachty und das Krakonoš-Theater. Rokytnice und Harrachov in wenigen Autominuten.",
     addr=[("Adresse", "K. Havlíčka Borovského 442/443, 512 11 Vysoké nad Jizerou"), ("Höhe", "ca. 700 m ü. M."), ("Winter", "Loipen, Lifte Šachty, Rokytnice, Harrachov"), ("Sommer", "Radwege, Wandern, Teich im Garten"), ("In der Stadt", "Schule, Krankenhaus, Bäckerei, Restaurants, Theater")],
@@ -554,7 +554,7 @@ VLNITA = {
              ("foto-05", "Kuchyně a dubové dveře", "Detail", ""),
              ("foto-03", "Průčelí domu", "Průčelí", "is-wide"),
              ("foto-25", "Koupelna s dubovou deskou umyvadla", "Detail koupelny", "")],
-    gal_note="Fotografie dokončeného domu.", cta_now="Aktuálně v prodeji: Ke Schodům", cta_dc="Do Čtvrti",
+    gal_note="Fotografie dokončeného domu, retušované (světlo, obloha, odstraněná zaparkovaná auta).", cta_now="Aktuálně v prodeji: Ke Schodům", cta_dc="Do Čtvrti",
 ),
 "en": dict(
     title="Rezidence Vlnitá | Nico &amp; Kai Development", desc="Rezidence Vlnitá: a completed residential project by Nico & Kai Development in Prague. All apartments sold.",
@@ -575,7 +575,7 @@ VLNITA = {
              ("foto-05", "Kitchen and oak doors", "Detail", ""),
              ("foto-03", "Facade of the house", "Facade", "is-wide"),
              ("foto-25", "Bathroom with an oak washbasin top", "Bathroom detail", "")],
-    gal_note="Photographs of the completed house.", cta_now="Now selling: Ke Schodům", cta_dc="Do Čtvrti",
+    gal_note="Photographs of the completed house, retouched (light, sky, parked cars removed).", cta_now="Now selling: Ke Schodům", cta_dc="Do Čtvrti",
 ),
 "de": dict(
     title="Rezidence Vlnitá | Nico &amp; Kai Development", desc="Rezidence Vlnitá: ein fertiggestelltes Wohnprojekt von Nico & Kai Development in Prag. Alle Wohnungen verkauft.",
@@ -596,7 +596,7 @@ VLNITA = {
              ("foto-05", "Küche und Eichentüren", "Detail", ""),
              ("foto-03", "Fassade des Hauses", "Fassade", "is-wide"),
              ("foto-25", "Bad mit Eichenplatte am Waschbecken", "Bad-Detail", "")],
-    gal_note="Fotografien des fertiggestellten Hauses.", cta_now="Aktuell im Verkauf: Ke Schodům", cta_dc="Do Čtvrti",
+    gal_note="Fotografien des fertiggestellten Hauses, retuschiert (Licht, Himmel, parkende Autos entfernt).", cta_now="Aktuell im Verkauf: Ke Schodům", cta_dc="Do Čtvrti",
 ),
 }
 
