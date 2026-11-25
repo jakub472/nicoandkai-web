@@ -1,278 +1,121 @@
 <!doctype html>
-<html lang="cs">
+<html lang="cs" data-nk-gate>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Nico &amp; Kai Development | Rezidenční projekty v Praze a v horách</title>
-  <meta name="description" content="Nico & Kai Development staví domy, ve kterých se dobře žije. Rezidence ke Schodům a Do Čtvrti v Praze-Modřanech v předprodeji, Apartmány Vysoké a Rezidence Vlnitá dokončeny.">
+  <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#000000">
-  <meta name="color-scheme" content="light">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="cs_CZ">
-  <meta property="og:site_name" content="Nico &amp; Kai Development">
-  <meta property="og:title" content="Nico &amp; Kai Development | Rezidenční projekty v Praze a v horách">
-  <meta property="og:description" content="Nico & Kai Development staví domy, ve kterých se dobře žije. Rezidence ke Schodům a Do Čtvrti v Praze-Modřanech v předprodeji, Apartmány Vysoké a Rezidence Vlnitá dokončeny.">
-  <meta property="og:image" content="https://nicoandkai.com/assets/img/og.jpg">
-  <meta property="og:url" content="https://nicoandkai.com/">
-  <link rel="canonical" href="https://nicoandkai.com/">
-  <link rel="alternate" hreflang="cs" href="https://nicoandkai.com/">
-  <link rel="alternate" hreflang="en" href="https://nicoandkai.com/en/">
-  <link rel="alternate" hreflang="de" href="https://nicoandkai.com/de/">
-  <link rel="alternate" hreflang="x-default" href="https://nicoandkai.com/">
-  <meta name="twitter:card" content="summary_large_image">
+  <title>Nico &amp; Kai Development</title>
   <link rel="icon" href="assets/img/icons/favicon.ico" sizes="48x48">
   <link rel="icon" href="assets/img/logo/nk-ikona-cerna.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/img/icons/apple-touch-icon.png">
-  <link rel="preload" href="assets/fonts/Manrope-Variable.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/styles.css?v=07e73146">
-  <link rel="stylesheet" href="assets/css/explorer.css?v=daa64b17">
-  <link rel="stylesheet" href="assets/css/site.css?v=cb3b1108">
-  <script>document.documentElement.classList.add('js')</script>
-  <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "Organization", "name": "Nico & Kai Development", "description": "Rezidenční development v Praze a v horách.", "areaServed": "Česká republika", "url": "https://nicoandkai.com/"}
-  </script>
+  <script>try{if(localStorage.getItem('nk-gate-key')||sessionStorage.getItem('nk-gate-key'))document.documentElement.className='has-key'}catch(e){}</script>
+  <style>
+    @font-face{font-family:"Manrope";src:url("assets/fonts/Manrope-Variable.woff2") format("woff2");font-weight:200 800;font-style:normal;font-display:swap}
+    *,*::before,*::after{box-sizing:border-box}
+    html{background:#000;color:#fff;-webkit-text-size-adjust:100%}
+    html.has-key{background:#fff}
+    body{margin:0;font:400 1.0625rem/1.6 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+    [hidden]{display:none!important}
+    .gate{--pad:clamp(1.25rem,4.2vw,3.75rem);min-height:100vh;min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;gap:2.5rem;padding:max(var(--pad),env(safe-area-inset-top)) max(var(--pad),env(safe-area-inset-right)) max(var(--pad),env(safe-area-inset-bottom)) max(var(--pad),env(safe-area-inset-left))}
+    .gate__logo{display:block;width:168px;height:auto}
+    .gate__box{align-self:center;max-width:46rem;padding-bottom:4vh}
+    .gate__eyebrow{display:flex;align-items:center;gap:.9rem;margin:0 0 clamp(1.5rem,4vw,2.75rem);font-size:.75rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+    .gate__eyebrow::after{content:"";flex:0 0 clamp(2rem,6vw,5rem);height:1px;background:rgba(255,255,255,.4)}
+    .gate h1{margin:0;font-size:clamp(2.5rem,7.4vw,6.5rem);font-weight:800;letter-spacing:-.04em;line-height:.98}
+    .gate h1 span{display:block;font-weight:300;letter-spacing:-.045em}
+    .gate__lead{margin:clamp(1.25rem,3vw,2rem) 0 0;max-width:31em;color:#c9c9c5;text-wrap:pretty}
+    .gate form{margin-top:clamp(2rem,5vw,3.5rem);max-width:31rem}
+    .gate label{display:block;font-size:.75rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c9c9c5}
+    .gate__row{display:flex;align-items:stretch;gap:1rem;margin-top:.5rem}
+    .gate input{flex:1;min-width:0;padding:.85rem 0;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.45);border-radius:0;color:#fff;font:600 1.125rem/1.3 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.1em;outline:none;transition:border-color .3s,box-shadow .3s}
+    .gate input:focus{border-color:#fff;box-shadow:0 1px 0 #fff}
+    .gate button{flex:none;display:inline-flex;align-items:center;justify-content:space-between;gap:1rem;min-height:3.35rem;padding:0 1.5rem;border:1px solid #fff;border-radius:0;background:#fff;color:#000;font:700 .9375rem/1.2 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;transition:background .35s,color .35s}
+    .gate button i{font-style:normal;transition:transform .35s}
+    .gate button:hover,.gate button:focus-visible{background:transparent;color:#fff;outline:none}
+    .gate button:hover i{transform:translateX(4px)}
+    .gate button[disabled]{opacity:.6;cursor:progress}
+    .gate__msg{min-height:1.6em;margin:.9rem 0 0;font-size:.9375rem;font-weight:700}
+    .gate__foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin:0;font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8a8a85}
+    .gate__foot nav{display:flex;gap:1.1rem}
+    .gate__foot a{color:inherit;text-decoration:none;padding:.4rem 0;transition:color .3s}
+    .gate__foot a[aria-current],.gate__foot a:hover,.gate__foot a:focus-visible{color:#fff}
+    .gate>*{opacity:0;transform:translateY(16px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+    .gate.is-in>*{opacity:1;transform:none}
+    .gate.is-in>.gate__box{transition-delay:.12s}
+    .gate.is-in>.gate__foot{transition-delay:.3s}
+    .is-wrong .gate__row{animation:nk-shake .4s}
+    @keyframes nk-shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+    @media (max-width:520px){.gate__row{flex-direction:column;gap:1.25rem}}
+    @media (prefers-reduced-motion:reduce){.gate>*{transition:none}.is-wrong .gate__row{animation:none}}
+    noscript p{margin:0;padding:2rem;font-weight:700}
+  </style>
 </head>
 <body>
-  <a class="skip" href="#obsah">Přeskočit na obsah</a>
-  <div class="progress" aria-hidden="true"></div>
-  <div class="splash" aria-hidden="true"><img src="assets/img/logo/nk-logo-nad-sebou-bile.svg" alt=""><div class="splash__bar"><i></i></div></div>
-  <header class="site-header" id="header">
-    <div class="wrap site-header__in">
-      <a class="brand" href="./" aria-label="Nico &amp; Kai Development – úvodní stránka">
-        <img class="brand__light" src="assets/img/logo/nk-logo-horizontalni-cerne.svg" alt="Nico &amp; Kai Development" width="168" height="30">
-        <img class="brand__dark" src="assets/img/logo/nk-logo-horizontalni-bile.svg" alt="" width="168" height="30" aria-hidden="true">
-      </a>
-      <nav class="nav" aria-label="Hlavní navigace">
-        <a href="#projekty" data-nav="projekty">Projekty</a>
-        <a href="#pristup" data-nav="pristup">Jak stavíme</a>
-        <a href="#reference" data-nav="reference">Reference</a>
-        <a href="#kontakt" data-nav="kontakt">Kontakt</a>
-      </nav>
-      <nav class="lang" aria-label="Jazyk"><a href="./" hreflang="cs" lang="cs" class="is-active" aria-current="page">CS</a><a href="en/" hreflang="en" lang="en">EN</a><a href="de/" hreflang="de" lang="de">DE</a></nav>
-      <a class="btn btn--sm header-cta" href="ke-schodum/"><span>Vybrat byt</span></a>
-      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
-        <span class="menu-btn__label">Menu</span>
-        <span class="menu-btn__icon" aria-hidden="true"><i></i><i></i></span>
-      </button>
+  <main class="gate" id="gate" hidden>
+    <img class="gate__logo" src="assets/img/logo/nk-logo-horizontalni-bile.svg" alt="Nico &amp; Kai Development" width="168" height="30">
+    <div class="gate__box">
+      <p class="gate__eyebrow">Soukromý náhled</p>
+      <h1>Web je přístupný<span>na heslo.</span></h1>
+      <p class="gate__lead">Stránky Nico &amp; Kai Development zatím nejsou veřejné. Zadejte prosím heslo, které jste od nás dostali.</p>
+      <form id="gate-form" novalidate>
+        <label for="gate-pw">Heslo</label>
+        <div class="gate__row">
+          <input id="gate-pw" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+          <button type="submit"><span>Vstoupit</span><i aria-hidden="true">→</i></button>
+        </div>
+        <p class="gate__msg" id="gate-msg" role="alert"></p>
+      </form>
     </div>
-  </header>
-
-  <div class="menu" id="menu" hidden>
-    <nav class="wrap menu__nav" aria-label="Mobilní navigace">
-      <a href="#projekty"><small>01</small>Projekty</a>
-      <a href="#pristup"><small>02</small>Jak stavíme</a>
-      <a href="#reference"><small>03</small>Reference</a>
-      <a href="#kontakt"><small>04</small>Kontakt</a>
-    </nav>
-    <div class="wrap"><nav class="lang lang--menu" aria-label="Jazyk"><a href="./" hreflang="cs" lang="cs" class="is-active" aria-current="page">CS</a><a href="en/" hreflang="en" lang="en">EN</a><a href="de/" hreflang="de" lang="de">DE</a></nav></div>
-  </div>
-
-  <main id="obsah">
-
-    <!-- ============ HERO ============ -->
-    <section class="hero-media dark" id="top" data-atmo="mist">
-      <div class="hero-media__bg is-slides">
-        <img src="assets/img/do-ctvrti/bddc_01a-1200.webp" srcset="assets/img/do-ctvrti/bddc_01a-600.webp 600w, assets/img/do-ctvrti/bddc_01a-1200.webp 1200w, assets/img/do-ctvrti/bddc_01a-2400.webp 2400w" sizes="100vw" data-full="assets/img/do-ctvrti/bddc_01a-2400.webp" alt="Rezidence Do Čtvrti" fetchpriority="high">
-        <img src="assets/img/ke-schodum/bdks_19-1200.webp" srcset="assets/img/ke-schodum/bdks_19-600.webp 600w, assets/img/ke-schodum/bdks_19-1200.webp 1200w, assets/img/ke-schodum/bdks_19-2400.webp 2400w" sizes="100vw" data-full="assets/img/ke-schodum/bdks_19-2400.webp" alt="Rezidence ke Schodům" loading="lazy">
-        <video class="hero-media__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="assets/video/do-ctvrti.mp4" data-src-sm="assets/video/do-ctvrti-720.mp4"></video><video class="hero-media__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="assets/video/ke-schodum.mp4" data-src-sm="assets/video/ke-schodum-720.mp4"></video>
-      </div>
-      <canvas class="hero-media__atmo" aria-hidden="true"></canvas>
-      <div class="wrap hero-media__body">
-        <p class="eyebrow" data-reveal>Nico &amp; Kai Development</p>
-        <h1 class="display">
-          <span class="mask"><span class="mask__in" style="--d:.05s">Domov,</span></span>
-          <span class="mask light"><span class="mask__in" style="--d:.17s">na který se těšíte.</span></span>
-        </h1>
-        <p class="lead" data-reveal style="--d:.35s">Stavíme domy pro skutečný život. Ne metry čtvereční, ale místa, kam se chcete vracet. V&nbsp;Praze i&nbsp;v&nbsp;horách.</p>
-        <div class="hero__cta" data-reveal style="--d:.45s">
-          <a class="btn" href="#projekty"><span>Naše projekty</span><i class="arrow" aria-hidden="true">→</i></a>
-          <a class="btn btn--ghost" href="ke-schodum/"><span>Předprodej: Ke Schodům</span></a>
-        </div>
-      </div>
-      <div class="wrap hero-media__meta">
-        <dl class="meta"><div><dt>V předprodeji</dt><dd>Rezidence ke&nbsp;Schodům · Do&nbsp;Čtvrti</dd></div><div><dt>V nabídce</dt><dd>Apartmány Vysoké</dd></div><div><dt>Dokončeno</dt><dd>Rezidence Vlnitá</dd></div></dl>
-        <a class="scroll-cue" href="#manifest"><span>Dolů</span><i aria-hidden="true"></i></a>
-      </div>
-    </section>
-
-    <!-- ============ MANIFEST ============ -->
-    <section class="section" id="manifest" aria-labelledby="manifest-title">
-      <div class="wrap">
-        <p class="eyebrow" data-reveal><span>01</span> Kdo jsme</p>
-        <h2 class="manifest" id="manifest-title" data-reveal>Neprodáváme byty. <strong>Vytváříme místa, kde se žije dobře.</strong> Promyšlená architektura, poctivé materiály a&nbsp;otevřená komunikace od první schůzky po předání klíčů.</h2>
-        <div class="numbers"><div data-reveal style="--d:.0s"><strong><span data-count="4">4</span></strong><span>rezidenční projekty</span></div><div data-reveal style="--d:.1s"><strong><span data-count="2">2</span></strong><span>dokončené a předané</span></div><div data-reveal style="--d:.2s"><strong><span data-count="17">17</span></strong><span>bytů v aktuální nabídce</span></div><div data-reveal style="--d:.3s"><strong><span data-count="100">100</span><small>%</small></strong><span>projektů s vlastní zahradou nebo terasou</span></div></div>
-      </div>
-    </section>
-
-    <!-- ============ PROJEKTY ============ -->
-    <section class="section dark" id="projekty" aria-labelledby="projects-title">
-      <div class="wrap">
-        <p class="eyebrow" data-reveal><span>02</span> Projekty</p>
-        <div class="section-head" data-reveal>
-          <h2 class="display display--md" id="projects-title"><span class="mask"><span class="mask__in" data-in>Naše</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">domy.</span></span></h2>
-          <p>Dva domy v&nbsp;Praze-Modřanech právě v&nbsp;předprodeji, horské apartmány s&nbsp;posledními třemi jednotkami a&nbsp;dokončená rezidence, která je naší vizitkou.</p>
-        </div>
-        <div class="pgrid">
-          <a class="pcard2" href="ke-schodum/" data-reveal>
-            <div class="pcard2__media"><span class="pcard2__badge is-live"><i aria-hidden="true"></i>Předprodej zahájen</span><img src="assets/img/ke-schodum/bdks_13-1200.webp" srcset="assets/img/ke-schodum/bdks_13-600.webp 600w, assets/img/ke-schodum/bdks_13-1200.webp 1200w, assets/img/ke-schodum/bdks_13-2400.webp 2400w" sizes="(max-width: 880px) 100vw, 50vw" data-full="assets/img/ke-schodum/bdks_13-2400.webp" alt="Rezidence ke Schodům" loading="lazy"></div>
-            <div class="pcard2__body">
-              <h3 class="pcard2__title">Rezidence <span class="light">ke&nbsp;Schodům</span></h3>
-              <p class="pcard2__meta"><span>Praha-Modřany</span><span>8 bytů · 2+kk a 3+kk</span><span>terasy až 104 m²</span></p>
-              <p class="pcard2__text">Osm bytů s&nbsp;terasami a&nbsp;zahradami, pohledový beton a&nbsp;dům, který si vyrábí energii. Rezervace se slevou až 5&nbsp;%.</p>
-              <span class="pcard2__cta">Vybrat byt <i aria-hidden="true">→</i></span>
-            </div>
-          </a>
-          <a class="pcard2" href="do-ctvrti/" data-reveal>
-            <div class="pcard2__media"><span class="pcard2__badge is-live"><i aria-hidden="true"></i>Předprodej zahájen</span><img src="assets/img/do-ctvrti/bddc_03-1200.webp" srcset="assets/img/do-ctvrti/bddc_03-600.webp 600w, assets/img/do-ctvrti/bddc_03-1200.webp 1200w, assets/img/do-ctvrti/bddc_03-2400.webp 2400w" sizes="(max-width: 880px) 100vw, 50vw" data-full="assets/img/do-ctvrti/bddc_03-2400.webp" alt="Rezidence Do Čtvrti" loading="lazy"></div>
-            <div class="pcard2__body">
-              <h3 class="pcard2__title">Rezidence <span class="light">Do&nbsp;Čtvrti</span></h3>
-              <p class="pcard2__meta"><span>Praha-Modřany</span><span>6 bytů · 2+kk a 3+kk</span><span>zahrady a střešní terasy</span></p>
-              <p class="pcard2__text">Nárožní dům se zaoblenými rohy a&nbsp;perforovanou cihlou. Jen dva byty na podlaží. Rezervace se slevou až 5&nbsp;%.</p>
-              <span class="pcard2__cta">Vybrat byt <i aria-hidden="true">→</i></span>
-            </div>
-          </a>
-          <a class="pcard2" href="apartmany-vysoke/" data-reveal>
-            <div class="pcard2__media"><span class="pcard2__badge"><i aria-hidden="true"></i>Poslední 3 apartmány</span><img src="assets/img/vysoke/e01-1200.webp" srcset="assets/img/vysoke/e01-600.webp 600w, assets/img/vysoke/e01-1200.webp 1200w, assets/img/vysoke/e01-2400.webp 2400w" sizes="(max-width: 880px) 100vw, 50vw" data-full="assets/img/vysoke/e01-2400.webp" alt="Apartmány Vysoké" loading="lazy"></div>
-            <div class="pcard2__body">
-              <h3 class="pcard2__title">Apartmány <span class="light">Vysoké</span></h3>
-              <p class="pcard2__meta"><span>Vysoké nad Jizerou</span><span>A2 · B1 · B2</span><span>dokončeno</span></p>
-              <p class="pcard2__text">Horské apartmány s&nbsp;terasami, společnou zahradou a&nbsp;jezírkem. Prodej posledních jednotek zajišťuje Svoboda &amp; Williams.</p>
-              <span class="pcard2__cta">Volné apartmány <i aria-hidden="true">→</i></span>
-            </div>
-          </a>
-          <a class="pcard2 pcard2--sold" href="rezidence-vlnita/" data-reveal>
-            <div class="pcard2__media"><span class="pcard2__badge is-sold"><i aria-hidden="true"></i>Prodáno</span><img src="assets/img/vlnita/foto-02-1200.webp" srcset="assets/img/vlnita/foto-02-600.webp 600w, assets/img/vlnita/foto-02-1200.webp 1200w, assets/img/vlnita/foto-02-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 50vw" data-full="assets/img/vlnita/foto-02-1800.webp" alt="Rezidence Vlnitá" loading="lazy"></div>
-            <div class="pcard2__body">
-              <h3 class="pcard2__title">Rezidence <span class="light">Vlnitá</span></h3>
-              <p class="pcard2__meta"><span>Praha</span><span>dokončeno</span><span>všechny byty prodány</span></p>
-              <p class="pcard2__text">Dokončený dům, který nám ukázal, že detail rozhoduje. Zůstává jako naše vizitka.</p>
-              <span class="pcard2__cta">Prohlédnout <i aria-hidden="true">→</i></span>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ JAK STAVÍME ============ -->
-    <section class="section" id="pristup" aria-labelledby="pristup-title">
-      <div class="wrap" style="display:grid;gap:clamp(3rem,8vw,7rem)">
-        <div>
-          <p class="eyebrow" data-reveal><span>03</span> Jak stavíme</p>
-          <h2 class="display display--md" id="pristup-title"><span class="mask"><span class="mask__in" data-in>Jednoduše,</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">poctivě, natrvalo.</span></span></h2>
-        </div>
-        <div class="split" data-reveal>
-          <div class="split__media"><img src="assets/img/ke-schodum/bdks_10-1200.webp" srcset="assets/img/ke-schodum/bdks_10-600.webp 600w, assets/img/ke-schodum/bdks_10-1200.webp 1200w, assets/img/ke-schodum/bdks_10-2400.webp 2400w" sizes="(max-width: 880px) 100vw, 58vw" data-full="assets/img/ke-schodum/bdks_10-2400.webp" alt="Zahrada Rezidence ke Schodům" loading="lazy"></div>
-          <div class="split__copy"><h3>Každý byt má kus nebe.</h3><p>Zahrada, terasa nebo balkon. Nestavíme dům, kde se venku jen parkuje. Obytné místnosti míří na jih, do zeleně, a&nbsp;venkovní prostor počítáme jako další pokoj.</p></div>
-        </div>
-        <div class="split split--flip" data-reveal>
-          <div class="split__media"><img src="assets/img/do-ctvrti/bddc_int_01-1200.webp" srcset="assets/img/do-ctvrti/bddc_int_01-600.webp 600w, assets/img/do-ctvrti/bddc_int_01-1200.webp 1200w, assets/img/do-ctvrti/bddc_int_01-2400.webp 2400w" sizes="(max-width: 880px) 100vw, 58vw" data-full="assets/img/do-ctvrti/bddc_int_01-2400.webp" alt="Interiér Rezidence Do Čtvrti" loading="lazy"></div>
-          <div class="split__copy"><h3>Materiály, které stárnou krásně.</h3><p>Pohledový beton, dřevo, omítky v&nbsp;teplých tónech, cihla a&nbsp;sklo. Méně prvků, zato lepších. Nic, co se za pár let musí vyměnit.</p></div>
-        </div>
-        <div class="split" data-reveal>
-          <div class="split__media"><img src="assets/img/ke-schodum/bdks_18-1200.webp" srcset="assets/img/ke-schodum/bdks_18-600.webp 600w, assets/img/ke-schodum/bdks_18-1200.webp 1200w, assets/img/ke-schodum/bdks_18-2400.webp 2400w" sizes="(max-width: 880px) 100vw, 58vw" data-full="assets/img/ke-schodum/bdks_18-2400.webp" alt="Detail fasády Rezidence ke Schodům" loading="lazy"></div>
-          <div class="split__copy"><h3>Důvěra se staví stejně jako dům.</h3><p>Srozumitelné informace, jasné termíny a&nbsp;přímý kontakt na lidi, kteří za projektem stojí. Když se něco změní, dozvíte se to od nás jako první.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ REFERENCE + PARTNEŘI ============ -->
-    <section class="section dark" id="reference" aria-labelledby="ref-title">
-      <div class="wrap">
-        <p class="eyebrow" data-reveal><span>04</span> Reference a partneři</p>
-        <h2 class="manifest" id="ref-title" data-reveal>Dva domy jsme už <strong>dokončili a&nbsp;předali</strong>. Dva další navrhujeme s&nbsp;ateliérem <strong>JA Architekti</strong>, který má za sebou desítky realizací.</h2>
-        <div class="partners" data-reveal>
-          <div class="partners__item"><small>Architektura obou pražských projektů</small><img src="assets/img/partners/ja-architekti.svg" alt="JA Architekti" style="height:2rem;width:auto;filter:invert(1)"></div>
-          <div class="partners__item"><small>Prodej Apartmánů Vysoké</small><strong>Svoboda <span>&amp;</span> Williams</strong></div>
-        </div>
-        <div class="pgrid" style="margin-top:clamp(2.5rem,5vw,4rem)">
-          <a class="pcard2" href="apartmany-vysoke/" data-reveal>
-            <div class="pcard2__media"><img src="assets/img/vysoke/e03w-1200.webp" srcset="assets/img/vysoke/e03w-600.webp 600w, assets/img/vysoke/e03w-1200.webp 1200w, assets/img/vysoke/e03w-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 50vw" data-full="assets/img/vysoke/e03w-1800.webp" alt="Apartmány Vysoké v zimě" loading="lazy"></div>
-            <div class="pcard2__body"><h3 class="pcard2__title">Apartmány <span class="light">Vysoké</span></h3><p class="pcard2__text">Dokončeno. Dva horské domy, zahrada s&nbsp;jezírkem, výhled na Krkonoše.</p><span class="pcard2__cta">Prohlédnout <i aria-hidden="true">→</i></span></div>
-          </a>
-          <a class="pcard2 pcard2--sold" href="rezidence-vlnita/" data-reveal style="--d:.1s">
-            <div class="pcard2__media"><img src="assets/img/vlnita/foto-13-1200.webp" srcset="assets/img/vlnita/foto-13-600.webp 600w, assets/img/vlnita/foto-13-1200.webp 1200w, assets/img/vlnita/foto-13-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 50vw" data-full="assets/img/vlnita/foto-13-1800.webp" alt="Obývací pokoj Rezidence Vlnitá" loading="lazy"></div>
-            <div class="pcard2__body"><h3 class="pcard2__title">Rezidence <span class="light">Vlnitá</span></h3><p class="pcard2__text">Dokončeno a&nbsp;prodáno. Čisté linie, tmavé dřevo a&nbsp;světlo.</p><span class="pcard2__cta">Prohlédnout <i aria-hidden="true">→</i></span></div>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <section class="section contact reserve" id="kontakt" aria-labelledby="reserve-title">
-      <div class="wrap">
-        <p class="eyebrow" data-reveal><span>05</span> Kontakt</p>
-        <div class="contact__grid">
-          <div class="contact__copy">
-            <h2 class="display display--md" id="reserve-title">
-              <span class="mask"><span class="mask__in" data-in>Chcete vědět</span></span>
-              <span class="mask light"><span class="mask__in" data-in style="--d:.12s">jako první?</span></span>
-            </h2>
-            <p class="lead" data-reveal>Zanechte nám kontakt. Ozveme se, jakmile budeme mít k&nbsp;projektům další informace, a&nbsp;rádi vás provedeme výběrem bytu.</p>
-            
-            <ul class="contact-list" data-reveal>
-              <li data-cfg-wrap="company.email"><span>E-mail</span><a data-cfg="company.email" data-cfg-href="mailto:"></a></li>
-              <li data-cfg-wrap="company.phone"><span>Telefon</span><a data-cfg="company.phone" data-cfg-href="tel:"></a></li>
-            </ul>
-          </div>
-          <form class="form js-lead-form" id="contact-form" data-project="Nico & Kai Development" novalidate data-reveal>
-            <div class="field"><input id="f-name" name="name" type="text" autocomplete="name" placeholder=" " required><label for="f-name">Jméno a&nbsp;příjmení</label></div>
-            <div class="field"><input id="f-email" name="email" type="email" autocomplete="email" placeholder=" " required><label for="f-email">E-mail</label></div>
-            <div class="field"><input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder=" "><label for="f-phone">Telefon <span>(volitelné)</span></label></div>
-            <div class="field"><textarea id="f-msg" name="message" rows="3" placeholder=" "></textarea><label for="f-msg">Zpráva <span>(volitelné)</span></label></div>
-            <div class="hp" aria-hidden="true"><label>Nevyplňujte <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-            <label class="check">
-              <input type="checkbox" name="consent" required>
-              <span class="check__box" aria-hidden="true"></span>
-              <span class="check__text">Souhlasím se <a href="ochrana-osobnich-udaju/" target="_blank" rel="noopener">zpracováním osobních údajů</a> za&nbsp;účelem odpovědi na&nbsp;můj dotaz a&nbsp;zasílání informací o&nbsp;projektu.</span>
-            </label>
-            <div class="form__actions">
-              <button class="btn" type="submit"><span>Odeslat</span><i class="arrow" aria-hidden="true">→</i></button>
-              <p class="form__status" role="status" aria-live="polite"></p>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section>
-
+    <footer class="gate__foot"><span>© Nico &amp; Kai Development</span><nav aria-label="Language"><a href="" aria-current="true" hreflang="cs" lang="cs">CS</a><a href="en/" hreflang="en" lang="en">EN</a><a href="de/" hreflang="de" lang="de">DE</a></nav></footer>
   </main>
+  <noscript><p>Pro zobrazení webu je potřeba zapnutý JavaScript.</p></noscript>
+  <script>
+  (async () => {
+    const D = {"s":"BCuit+qFMxvbXpHaz+rnMA==","n":250000,"i":"nTSd75XHnmtqzbpX","c":"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"};
+    const T = {"button":"Vstoupit","busy":"Ověřuji…","wrong":"Heslo nesouhlasí. Zkuste to prosím znovu.","nocrypto":"Tento prohlížeč stránku neumí odemknout. Otevřete ji prosím v aktuálním Safari nebo Chromu."};
+    const K = 'nk-gate-key';
+    const el = (id) => document.getElementById(id);
+    const bytes = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+    const saved = () => { try { return localStorage.getItem(K) || sessionStorage.getItem(K); } catch (e) { return null; } };
+    const remember = (v) => { try { localStorage.setItem(K, v); } catch (e) { try { sessionStorage.setItem(K, v); } catch (e2) { /* soukromý režim */ } } };
+    const forget = () => { try { localStorage.removeItem(K); sessionStorage.removeItem(K); } catch (e) { /* nic */ } };
+    const decrypt = async (raw) => {
+      const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+      return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(D.i) }, key, bytes(D.c)));
+    };
+    const open = (html) => {
+      const hash = location.hash;
+      document.open(); document.write(html); document.close();
+      if (hash.length > 1) setTimeout(() => { const t = document.getElementById(decodeURIComponent(hash.slice(1))); if (t) t.scrollIntoView(); }, 500);
+    };
+    const ok = !!(window.crypto && crypto.subtle);
+    const had = ok && saved();
+    if (had) { try { return open(await decrypt(bytes(had))); } catch (e) { forget(); } }
 
-  <footer class="footer dark">
-    <div class="wrap">
-      <div class="footer__top">
-        <a class="brand" href="./" aria-label="Nico &amp; Kai Development – úvodní stránka">
-          <img src="assets/img/logo/nk-logo-horizontalni-bile.svg" alt="Nico &amp; Kai Development" width="168" height="30">
-        </a>
-        <nav class="footer__nav" aria-label="Patička">
-          <a href="ke-schodum/">Rezidence ke Schodům</a>
-          <a href="do-ctvrti/">Rezidence Do Čtvrti</a>
-          <a href="apartmany-vysoke/">Apartmány Vysoké</a>
-          <a href="rezidence-vlnita/">Rezidence Vlnitá</a>
-          <a href="ochrana-osobnich-udaju/">Ochrana osobních údajů</a>
-        </nav>
-      </div>
-
-      <div class="partners">
-        <div class="partners__item"><small>Architektura</small><img src="assets/img/partners/ja-architekti.svg" alt="JA Architekti" style="height:1.6rem;width:auto;filter:invert(1)"></div>
-      </div>
-
-      <ul class="legal-list" data-cfg-group>
-        <li data-cfg-wrap="company.legalName"><span>Společnost</span><span data-cfg="company.legalName"></span></li>
-        <li data-cfg-wrap="company.ico"><span>IČO</span><span data-cfg="company.ico"></span></li>
-        <li data-cfg-wrap="company.dic"><span>DIČ</span><span data-cfg="company.dic"></span></li>
-        <li data-cfg-wrap="company.address"><span>Sídlo</span><span data-cfg="company.address"></span></li>
-        <li data-cfg-wrap="company.email"><span>E-mail</span><a data-cfg="company.email" data-cfg-href="mailto:"></a></li>
-        <li data-cfg-wrap="company.phone"><span>Telefon</span><a data-cfg="company.phone" data-cfg-href="tel:"></a></li>
-      </ul>
-
-      <p class="footer__note">
-        Informace na&nbsp;tomto webu mají informativní charakter a&nbsp;nejsou návrhem na&nbsp;uzavření smlouvy ve&nbsp;smyslu § 1732 občanského zákoníku. Vizualizace jsou ilustrativní, plochy jsou uvedeny dle projektové dokumentace a&nbsp;mohou se změnit.
-      </p>
-      <p class="footer__copy">© <span data-year>2026</span> Nico &amp; Kai Development · <nav class="lang lang--inline" aria-label="Jazyk"><a href="./" hreflang="cs" lang="cs" class="is-active" aria-current="page">CS</a><a href="en/" hreflang="en" lang="en">EN</a><a href="de/" hreflang="de" lang="de">DE</a></nav></p>
-    </div>
-    <img class="footer__mark" src="assets/img/logo/nk-monogram-bile.svg" alt="" aria-hidden="true">
-  </footer>
-  <script src="assets/js/config.js?v=093afc21"></script>
-  <script src="assets/js/main.js?v=34918966"></script>
-  <script src="assets/js/site.js?v=385265ab"></script>
-  <script src="assets/js/atmo.js?v=fb3be614" defer></script>
+    document.documentElement.className = '';
+    const gate = el('gate'), form = el('gate-form'), input = el('gate-pw'), msg = el('gate-msg'), btn = form.querySelector('button'), lbl = btn.querySelector('span');
+    gate.hidden = false;
+    setTimeout(() => gate.classList.add('is-in'), 30);
+    if (!ok) { msg.textContent = T.nocrypto; btn.disabled = true; return; }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pw = input.value.replace(/[\s\-\u2010-\u2015_.]/g, '').toUpperCase();
+      if (!pw) { input.focus(); return; }
+      btn.disabled = true; lbl.textContent = T.busy; msg.textContent = ''; form.classList.remove('is-wrong');
+      try {
+        const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
+        const raw = new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: bytes(D.s), iterations: D.n, hash: 'SHA-256' }, base, 256));
+        const html = await decrypt(raw);
+        remember(btoa(String.fromCharCode(...raw)));
+        open(html);
+      } catch (err) {
+        btn.disabled = false; lbl.textContent = T.button; msg.textContent = T.wrong;
+        void form.offsetWidth; form.classList.add('is-wrong');
+        input.select(); input.focus();
+      }
+    });
+  })();
+  </script>
 </body>
 </html>

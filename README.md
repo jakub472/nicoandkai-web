@@ -31,6 +31,20 @@ assets/css/site.css              komponenty webu; styles.css = základ a typogra
 assets/img/<projekt>/            vizualizace a fotky ve 3 šířkách (600/1200/1800–2400 px, WebP)
 ```
 
+## Zámek heslem
+
+Web je zamčený: `build-pages.py` po vygenerování každou stránku zašifruje (`tools/protect.mjs`, AES-256-GCM, klíč z hesla
+přes PBKDF2) a uloží místo ní vstupní obrazovku, která obsah po zadání hesla dešifruje v prohlížeči a heslo si zapamatuje.
+Heslo není ve webu ani v repozitáři – skript ho čte z proměnné `NK_HESLO` nebo ze souboru `nico-kai-heslo.txt` o úroveň výš.
+Při zadávání nezáleží na velikosti písmen, mezerách ani pomlčkách. Zamčené stránky mají `noindex`.
+
+- Změna hesla: přepište soubor s heslem a spusťte `python3 tools/build-pages.py` (návštěvníci ho zadají znovu).
+- Odemknutí webu pro veřejnost: `python3 tools/build-pages.py --verejne`.
+- Přečtení zamčené stránky: `NK_HESLO=… node tools/protect.mjs --decrypt index.html`.
+- Zámek chrání texty a strukturu stránek. Obrázky, styly, skripty a data v `assets/` šifrované nejsou a tento repozitář
+  je veřejný včetně zdrojových textů (`tools/i18n.py`) a historie – zámek tedy drží běžné návštěvníky a vyhledávače,
+  ne někoho, kdo si najde repozitář na GitHubu.
+
 ## Jazyky (CS / EN / DE)
 
 Čeština je v kořeni, angličtina v `en/`, němčina v `de/` (stejné adresy stránek; GDPR je `en/privacy/` a `de/datenschutz/`).

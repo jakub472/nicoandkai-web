@@ -1,153 +1,121 @@
 <!doctype html>
-<html lang="cs">
+<html lang="cs" data-nk-gate>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Rezidence Vlnitá | Nico &amp; Kai Development</title>
-  <meta name="description" content="Rezidence Vlnitá: dokončený rezidenční projekt Nico & Kai Development v Praze. Všechny byty prodány.">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="color-scheme" content="light">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="cs_CZ">
-  <meta property="og:site_name" content="Nico &amp; Kai Development">
-  <meta property="og:title" content="Rezidence Vlnitá | Nico &amp; Kai Development">
-  <meta property="og:description" content="Rezidence Vlnitá: dokončený rezidenční projekt Nico & Kai Development v Praze. Všechny byty prodány.">
-  <meta property="og:image" content="https://nicoandkai.com/assets/img/og-vlnita.jpg">
-  <meta property="og:url" content="https://nicoandkai.com/rezidence-vlnita/">
-  <link rel="canonical" href="https://nicoandkai.com/rezidence-vlnita/">
-  <link rel="alternate" hreflang="cs" href="https://nicoandkai.com/rezidence-vlnita/">
-  <link rel="alternate" hreflang="en" href="https://nicoandkai.com/en/rezidence-vlnita/">
-  <link rel="alternate" hreflang="de" href="https://nicoandkai.com/de/rezidence-vlnita/">
-  <link rel="alternate" hreflang="x-default" href="https://nicoandkai.com/rezidence-vlnita/">
-  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#000000">
+  <title>Nico &amp; Kai Development</title>
   <link rel="icon" href="../assets/img/icons/favicon.ico" sizes="48x48">
   <link rel="icon" href="../assets/img/logo/nk-ikona-cerna.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="../assets/img/icons/apple-touch-icon.png">
-  <link rel="preload" href="../assets/fonts/Manrope-Variable.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/styles.css?v=07e73146">
-  <link rel="stylesheet" href="../assets/css/explorer.css?v=daa64b17">
-  <link rel="stylesheet" href="../assets/css/site.css?v=cb3b1108">
-  <script>document.documentElement.classList.add('js')</script>
+  <script>try{if(localStorage.getItem('nk-gate-key')||sessionStorage.getItem('nk-gate-key'))document.documentElement.className='has-key'}catch(e){}</script>
+  <style>
+    @font-face{font-family:"Manrope";src:url("../assets/fonts/Manrope-Variable.woff2") format("woff2");font-weight:200 800;font-style:normal;font-display:swap}
+    *,*::before,*::after{box-sizing:border-box}
+    html{background:#000;color:#fff;-webkit-text-size-adjust:100%}
+    html.has-key{background:#fff}
+    body{margin:0;font:400 1.0625rem/1.6 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+    [hidden]{display:none!important}
+    .gate{--pad:clamp(1.25rem,4.2vw,3.75rem);min-height:100vh;min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;gap:2.5rem;padding:max(var(--pad),env(safe-area-inset-top)) max(var(--pad),env(safe-area-inset-right)) max(var(--pad),env(safe-area-inset-bottom)) max(var(--pad),env(safe-area-inset-left))}
+    .gate__logo{display:block;width:168px;height:auto}
+    .gate__box{align-self:center;max-width:46rem;padding-bottom:4vh}
+    .gate__eyebrow{display:flex;align-items:center;gap:.9rem;margin:0 0 clamp(1.5rem,4vw,2.75rem);font-size:.75rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+    .gate__eyebrow::after{content:"";flex:0 0 clamp(2rem,6vw,5rem);height:1px;background:rgba(255,255,255,.4)}
+    .gate h1{margin:0;font-size:clamp(2.5rem,7.4vw,6.5rem);font-weight:800;letter-spacing:-.04em;line-height:.98}
+    .gate h1 span{display:block;font-weight:300;letter-spacing:-.045em}
+    .gate__lead{margin:clamp(1.25rem,3vw,2rem) 0 0;max-width:31em;color:#c9c9c5;text-wrap:pretty}
+    .gate form{margin-top:clamp(2rem,5vw,3.5rem);max-width:31rem}
+    .gate label{display:block;font-size:.75rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c9c9c5}
+    .gate__row{display:flex;align-items:stretch;gap:1rem;margin-top:.5rem}
+    .gate input{flex:1;min-width:0;padding:.85rem 0;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.45);border-radius:0;color:#fff;font:600 1.125rem/1.3 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.1em;outline:none;transition:border-color .3s,box-shadow .3s}
+    .gate input:focus{border-color:#fff;box-shadow:0 1px 0 #fff}
+    .gate button{flex:none;display:inline-flex;align-items:center;justify-content:space-between;gap:1rem;min-height:3.35rem;padding:0 1.5rem;border:1px solid #fff;border-radius:0;background:#fff;color:#000;font:700 .9375rem/1.2 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;transition:background .35s,color .35s}
+    .gate button i{font-style:normal;transition:transform .35s}
+    .gate button:hover,.gate button:focus-visible{background:transparent;color:#fff;outline:none}
+    .gate button:hover i{transform:translateX(4px)}
+    .gate button[disabled]{opacity:.6;cursor:progress}
+    .gate__msg{min-height:1.6em;margin:.9rem 0 0;font-size:.9375rem;font-weight:700}
+    .gate__foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin:0;font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8a8a85}
+    .gate__foot nav{display:flex;gap:1.1rem}
+    .gate__foot a{color:inherit;text-decoration:none;padding:.4rem 0;transition:color .3s}
+    .gate__foot a[aria-current],.gate__foot a:hover,.gate__foot a:focus-visible{color:#fff}
+    .gate>*{opacity:0;transform:translateY(16px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+    .gate.is-in>*{opacity:1;transform:none}
+    .gate.is-in>.gate__box{transition-delay:.12s}
+    .gate.is-in>.gate__foot{transition-delay:.3s}
+    .is-wrong .gate__row{animation:nk-shake .4s}
+    @keyframes nk-shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+    @media (max-width:520px){.gate__row{flex-direction:column;gap:1.25rem}}
+    @media (prefers-reduced-motion:reduce){.gate>*{transition:none}.is-wrong .gate__row{animation:none}}
+    noscript p{margin:0;padding:2rem;font-weight:700}
+  </style>
 </head>
 <body>
-  <a class="skip" href="#obsah">Přeskočit na obsah</a>
-  <div class="progress" aria-hidden="true"></div>
-  <header class="site-header" id="header">
-    <div class="wrap site-header__in">
-      <a class="brand" href="../" aria-label="Nico &amp; Kai Development – úvodní stránka">
-        <img class="brand__light" src="../assets/img/logo/nk-logo-horizontalni-cerne.svg" alt="Nico &amp; Kai Development" width="168" height="30">
-        <img class="brand__dark" src="../assets/img/logo/nk-logo-horizontalni-bile.svg" alt="" width="168" height="30" aria-hidden="true">
-      </a>
-      <nav class="nav" aria-label="Hlavní navigace">
-        <a href="#pribeh" data-nav="pribeh">O domě</a>
-        <a href="#galerie" data-nav="galerie">Galerie</a>
-        <a href="../#projekty" data-nav="..">Aktuální projekty</a>
-      </nav>
-      <nav class="lang" aria-label="Jazyk"><a href="../rezidence-vlnita/" hreflang="cs" lang="cs" class="is-active" aria-current="page">CS</a><a href="../en/rezidence-vlnita/" hreflang="en" lang="en">EN</a><a href="../de/rezidence-vlnita/" hreflang="de" lang="de">DE</a></nav>
-      <a class="btn btn--sm header-cta" href="../#projekty"><span>Aktuální projekty</span></a>
-      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
-        <span class="menu-btn__label">Menu</span>
-        <span class="menu-btn__icon" aria-hidden="true"><i></i><i></i></span>
-      </button>
+  <main class="gate" id="gate" hidden>
+    <img class="gate__logo" src="../assets/img/logo/nk-logo-horizontalni-bile.svg" alt="Nico &amp; Kai Development" width="168" height="30">
+    <div class="gate__box">
+      <p class="gate__eyebrow">Soukromý náhled</p>
+      <h1>Web je přístupný<span>na heslo.</span></h1>
+      <p class="gate__lead">Stránky Nico &amp; Kai Development zatím nejsou veřejné. Zadejte prosím heslo, které jste od nás dostali.</p>
+      <form id="gate-form" novalidate>
+        <label for="gate-pw">Heslo</label>
+        <div class="gate__row">
+          <input id="gate-pw" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+          <button type="submit"><span>Vstoupit</span><i aria-hidden="true">→</i></button>
+        </div>
+        <p class="gate__msg" id="gate-msg" role="alert"></p>
+      </form>
     </div>
-  </header>
-
-  <div class="menu" id="menu" hidden>
-    <nav class="wrap menu__nav" aria-label="Mobilní navigace">
-      <a href="#pribeh"><small>01</small>O domě</a>
-      <a href="#galerie"><small>02</small>Galerie</a>
-      <a href="../#projekty"><small>03</small>Aktuální projekty</a>
-    </nav>
-    <div class="wrap"><nav class="lang lang--menu" aria-label="Jazyk"><a href="../rezidence-vlnita/" hreflang="cs" lang="cs" class="is-active" aria-current="page">CS</a><a href="../en/rezidence-vlnita/" hreflang="en" lang="en">EN</a><a href="../de/rezidence-vlnita/" hreflang="de" lang="de">DE</a></nav></div>
-  </div>
-
-  <main id="obsah">
-
-    <section class="hero" id="top">
-      <div class="wrap hero__grid">
-        <div class="hero__copy">
-          <p class="sold-banner" data-reveal><i aria-hidden="true"></i>Prodáno · dokončeno</p>
-          <h1 class="display">
-            <span class="mask"><span class="mask__in" style="--d:.05s">Rezidence</span></span>
-            <span class="mask light"><span class="mask__in" style="--d:.17s">Vlnitá</span></span>
-          </h1>
-          <p class="lead" data-reveal style="--d:.35s">Dokončený dům v&nbsp;Praze. Všechny byty mají své majitele. Zůstává jako ukázka toho, jak stavíme.</p>
-          <div class="hero__cta" data-reveal style="--d:.45s">
-            <a class="btn" href="../ke-schodum/"><span>Rezidence ke Schodům</span><i class="arrow" aria-hidden="true">→</i></a>
-            <a class="btn btn--ghost" href="../do-ctvrti/"><span>Rezidence Do Čtvrti</span></a>
-          </div>
-        </div>
-        <div class="hero__art" style="margin-right:0"><img src="../assets/img/vlnita/foto-02-1200.webp" srcset="../assets/img/vlnita/foto-02-600.webp 600w, ../assets/img/vlnita/foto-02-1200.webp 1200w, ../assets/img/vlnita/foto-02-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 55vw" data-full="../assets/img/vlnita/foto-02-1800.webp" alt="Rezidence Vlnitá z ulice" fetchpriority="high"></div>
-      </div>
-      <div class="wrap hero__meta">
-        <dl class="meta"><div><dt>Lokalita</dt><dd>Praha</dd></div><div><dt>Stav</dt><dd>Prodáno, dokončeno</dd></div><div><dt>Typ</dt><dd>Rezidenční dům</dd></div></dl>
-        <a class="scroll-cue" href="#pribeh"><span>Dolů</span><i aria-hidden="true"></i></a>
-      </div>
-    </section>
-
-    <section class="section dark" id="pribeh" aria-labelledby="pribeh-title">
-      <div class="wrap">
-        <p class="eyebrow" data-reveal><span>01</span> O domě</p>
-        <h2 class="manifest" id="pribeh-title" data-reveal>Čisté linie, <strong>tmavé dřevo a&nbsp;světlo</strong>. Dům, u&nbsp;kterého jsme si ověřili, že <strong>detail rozhoduje</strong>: od dubových dveří po kování.</h2>
-        <div class="split" style="margin-top:clamp(3rem,7vw,6rem)" data-reveal>
-          <div class="split__media"><img src="../assets/img/vlnita/foto-13-1200.webp" srcset="../assets/img/vlnita/foto-13-600.webp 600w, ../assets/img/vlnita/foto-13-1200.webp 1200w, ../assets/img/vlnita/foto-13-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 58vw" data-full="../assets/img/vlnita/foto-13-1800.webp" alt="Obývací pokoj s krbem" loading="lazy"></div>
-          <div class="split__copy"><h3>Co jsme si odnesli.</h3><p>Velká okna, krb a&nbsp;jeden materiál na podlaze v&nbsp;celém bytě. Méně prvků, zato lepších. Stejný přístup dnes vedeme do Rezidence ke Schodům a&nbsp;Do Čtvrti.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="galerie" aria-labelledby="gal-title">
-      <div class="wrap">
-        <p class="eyebrow" data-reveal><span>02</span> Galerie</p>
-        <div class="gallery" aria-label="Galerie fotografií"><figure class="is-big"><img src="../assets/img/vlnita/foto-02-1200.webp" srcset="../assets/img/vlnita/foto-02-600.webp 600w, ../assets/img/vlnita/foto-02-1200.webp 1200w, ../assets/img/vlnita/foto-02-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 66vw" data-full="../assets/img/vlnita/foto-02-1800.webp" alt="Rezidence Vlnitá z ulice při západu slunce" loading="lazy"><figcaption>Z ulice</figcaption></figure><figure class="is-tall"><img src="../assets/img/vlnita/foto-24-1200.webp" srcset="../assets/img/vlnita/foto-24-600.webp 600w, ../assets/img/vlnita/foto-24-1200.webp 1200w, ../assets/img/vlnita/foto-24-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 33vw" data-full="../assets/img/vlnita/foto-24-1800.webp" alt="Rezidence Vlnitá z ulice ve dne" loading="lazy"><figcaption>Dům z ulice</figcaption></figure><figure class="is-tall"><img src="../assets/img/vlnita/foto-23-1200.webp" srcset="../assets/img/vlnita/foto-23-600.webp 600w, ../assets/img/vlnita/foto-23-1200.webp 1200w, ../assets/img/vlnita/foto-23-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 33vw" data-full="../assets/img/vlnita/foto-23-1800.webp" alt="Sprchový kout s velkoformátovým obkladem" loading="lazy"><figcaption>Koupelna</figcaption></figure><figure class="is-big"><img src="../assets/img/vlnita/foto-21-1200.webp" srcset="../assets/img/vlnita/foto-21-600.webp 600w, ../assets/img/vlnita/foto-21-1200.webp 1200w, ../assets/img/vlnita/foto-21-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 66vw" data-full="../assets/img/vlnita/foto-21-1800.webp" alt="Dům a zahrada z nadhledu, v pozadí Praha" loading="lazy"><figcaption>Dům a zahrada</figcaption></figure><figure class="is-tall"><img src="../assets/img/vlnita/foto-04-1200.webp" srcset="../assets/img/vlnita/foto-04-600.webp 600w, ../assets/img/vlnita/foto-04-1200.webp 1200w, ../assets/img/vlnita/foto-04-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 33vw" data-full="../assets/img/vlnita/foto-04-1800.webp" alt="Kuchyně s dřevěnou dýhou" loading="lazy"><figcaption>Kuchyně</figcaption></figure><figure class="is-tall"><img src="../assets/img/vlnita/foto-13-1200.webp" srcset="../assets/img/vlnita/foto-13-600.webp 600w, ../assets/img/vlnita/foto-13-1200.webp 1200w, ../assets/img/vlnita/foto-13-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 33vw" data-full="../assets/img/vlnita/foto-13-1800.webp" alt="Obývací pokoj s krbem" loading="lazy"><figcaption>Obývací pokoj</figcaption></figure><figure><img src="../assets/img/vlnita/foto-22-1200.webp" srcset="../assets/img/vlnita/foto-22-600.webp 600w, ../assets/img/vlnita/foto-22-1200.webp 1200w, ../assets/img/vlnita/foto-22-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 33vw" data-full="../assets/img/vlnita/foto-22-1800.webp" alt="Kuchyně se světlou linkou" loading="lazy"><figcaption>Kuchyně</figcaption></figure><figure><img src="../assets/img/vlnita/foto-05-1200.webp" srcset="../assets/img/vlnita/foto-05-600.webp 600w, ../assets/img/vlnita/foto-05-1200.webp 1200w, ../assets/img/vlnita/foto-05-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 33vw" data-full="../assets/img/vlnita/foto-05-1800.webp" alt="Kuchyně a dubové dveře" loading="lazy"><figcaption>Detail</figcaption></figure><figure class="is-wide"><img src="../assets/img/vlnita/foto-03-1200.webp" srcset="../assets/img/vlnita/foto-03-600.webp 600w, ../assets/img/vlnita/foto-03-1200.webp 1200w, ../assets/img/vlnita/foto-03-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 66vw" data-full="../assets/img/vlnita/foto-03-1800.webp" alt="Průčelí domu" loading="lazy"><figcaption>Průčelí</figcaption></figure><figure><img src="../assets/img/vlnita/foto-25-1200.webp" srcset="../assets/img/vlnita/foto-25-600.webp 600w, ../assets/img/vlnita/foto-25-1200.webp 1200w, ../assets/img/vlnita/foto-25-1800.webp 1800w" sizes="(max-width: 880px) 100vw, 33vw" data-full="../assets/img/vlnita/foto-25-1800.webp" alt="Koupelna s dubovou deskou umyvadla" loading="lazy"><figcaption>Detail koupelny</figcaption></figure></div>
-        <p class="note" style="margin-top:1rem">Fotografie dokončeného domu, retušované (světlo, obloha, odstraněná zaparkovaná auta).</p>
-        <div data-reveal style="margin-top:clamp(2rem,5vw,4rem);display:flex;gap:.75rem;flex-wrap:wrap">
-          <a class="btn" href="../ke-schodum/"><span>Aktuálně v prodeji: Ke Schodům</span><i class="arrow" aria-hidden="true">→</i></a>
-          <a class="btn btn--ghost" href="../do-ctvrti/"><span>Do Čtvrti</span></a>
-        </div>
-      </div>
-    </section>
+    <footer class="gate__foot"><span>© Nico &amp; Kai Development</span><nav aria-label="Language"><a href="../" aria-current="true" hreflang="cs" lang="cs">CS</a><a href="../en/" hreflang="en" lang="en">EN</a><a href="../de/" hreflang="de" lang="de">DE</a></nav></footer>
   </main>
+  <noscript><p>Pro zobrazení webu je potřeba zapnutý JavaScript.</p></noscript>
+  <script>
+  (async () => {
+    const D = {"s":"BCuit+qFMxvbXpHaz+rnMA==","n":250000,"i":"BPsUpWfgqwQEsn2a","c":"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"};
+    const T = {"button":"Vstoupit","busy":"Ověřuji…","wrong":"Heslo nesouhlasí. Zkuste to prosím znovu.","nocrypto":"Tento prohlížeč stránku neumí odemknout. Otevřete ji prosím v aktuálním Safari nebo Chromu."};
+    const K = 'nk-gate-key';
+    const el = (id) => document.getElementById(id);
+    const bytes = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+    const saved = () => { try { return localStorage.getItem(K) || sessionStorage.getItem(K); } catch (e) { return null; } };
+    const remember = (v) => { try { localStorage.setItem(K, v); } catch (e) { try { sessionStorage.setItem(K, v); } catch (e2) { /* soukromý režim */ } } };
+    const forget = () => { try { localStorage.removeItem(K); sessionStorage.removeItem(K); } catch (e) { /* nic */ } };
+    const decrypt = async (raw) => {
+      const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+      return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(D.i) }, key, bytes(D.c)));
+    };
+    const open = (html) => {
+      const hash = location.hash;
+      document.open(); document.write(html); document.close();
+      if (hash.length > 1) setTimeout(() => { const t = document.getElementById(decodeURIComponent(hash.slice(1))); if (t) t.scrollIntoView(); }, 500);
+    };
+    const ok = !!(window.crypto && crypto.subtle);
+    const had = ok && saved();
+    if (had) { try { return open(await decrypt(bytes(had))); } catch (e) { forget(); } }
 
-  <footer class="footer dark">
-    <div class="wrap">
-      <div class="footer__top">
-        <a class="brand" href="../" aria-label="Nico &amp; Kai Development – úvodní stránka">
-          <img src="../assets/img/logo/nk-logo-horizontalni-bile.svg" alt="Nico &amp; Kai Development" width="168" height="30">
-        </a>
-        <nav class="footer__nav" aria-label="Patička">
-          <a href="../ke-schodum/">Rezidence ke Schodům</a>
-          <a href="../do-ctvrti/">Rezidence Do Čtvrti</a>
-          <a href="../apartmany-vysoke/">Apartmány Vysoké</a>
-          <a href="../rezidence-vlnita/">Rezidence Vlnitá</a>
-          <a href="../ochrana-osobnich-udaju/">Ochrana osobních údajů</a>
-        </nav>
-      </div>
-
-      <div class="partners">
-        <div class="partners__item"><small>Architektura</small><img src="../assets/img/partners/ja-architekti.svg" alt="JA Architekti" style="height:1.6rem;width:auto;filter:invert(1)"></div>
-      </div>
-
-      <ul class="legal-list" data-cfg-group>
-        <li data-cfg-wrap="company.legalName"><span>Společnost</span><span data-cfg="company.legalName"></span></li>
-        <li data-cfg-wrap="company.ico"><span>IČO</span><span data-cfg="company.ico"></span></li>
-        <li data-cfg-wrap="company.dic"><span>DIČ</span><span data-cfg="company.dic"></span></li>
-        <li data-cfg-wrap="company.address"><span>Sídlo</span><span data-cfg="company.address"></span></li>
-        <li data-cfg-wrap="company.email"><span>E-mail</span><a data-cfg="company.email" data-cfg-href="mailto:"></a></li>
-        <li data-cfg-wrap="company.phone"><span>Telefon</span><a data-cfg="company.phone" data-cfg-href="tel:"></a></li>
-      </ul>
-
-      <p class="footer__note">
-        Informace na&nbsp;tomto webu mají informativní charakter a&nbsp;nejsou návrhem na&nbsp;uzavření smlouvy ve&nbsp;smyslu § 1732 občanského zákoníku. Vizualizace jsou ilustrativní, plochy jsou uvedeny dle projektové dokumentace a&nbsp;mohou se změnit.
-      </p>
-      <p class="footer__copy">© <span data-year>2026</span> Nico &amp; Kai Development · <nav class="lang lang--inline" aria-label="Jazyk"><a href="../rezidence-vlnita/" hreflang="cs" lang="cs" class="is-active" aria-current="page">CS</a><a href="../en/rezidence-vlnita/" hreflang="en" lang="en">EN</a><a href="../de/rezidence-vlnita/" hreflang="de" lang="de">DE</a></nav></p>
-    </div>
-    <img class="footer__mark" src="../assets/img/logo/nk-monogram-bile.svg" alt="" aria-hidden="true">
-  </footer>
-  <script src="../assets/js/config.js?v=093afc21"></script>
-  <script src="../assets/data/vlnita.js?v=5c0fe4dc"></script>
-  <script src="../assets/js/main.js?v=34918966"></script>
-  <script src="../assets/js/site.js?v=385265ab"></script>
-  <script src="../assets/js/atmo.js?v=fb3be614" defer></script>
+    document.documentElement.className = '';
+    const gate = el('gate'), form = el('gate-form'), input = el('gate-pw'), msg = el('gate-msg'), btn = form.querySelector('button'), lbl = btn.querySelector('span');
+    gate.hidden = false;
+    setTimeout(() => gate.classList.add('is-in'), 30);
+    if (!ok) { msg.textContent = T.nocrypto; btn.disabled = true; return; }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pw = input.value.replace(/[\s\-\u2010-\u2015_.]/g, '').toUpperCase();
+      if (!pw) { input.focus(); return; }
+      btn.disabled = true; lbl.textContent = T.busy; msg.textContent = ''; form.classList.remove('is-wrong');
+      try {
+        const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
+        const raw = new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: bytes(D.s), iterations: D.n, hash: 'SHA-256' }, base, 256));
+        const html = await decrypt(raw);
+        remember(btoa(String.fromCharCode(...raw)));
+        open(html);
+      } catch (err) {
+        btn.disabled = false; lbl.textContent = T.button; msg.textContent = T.wrong;
+        void form.offsetWidth; form.classList.add('is-wrong');
+        input.select(); input.focus();
+      }
+    });
+  })();
+  </script>
 </body>
 </html>

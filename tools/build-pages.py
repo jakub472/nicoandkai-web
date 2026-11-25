@@ -790,6 +790,20 @@ def home_page(C):
 # ======================================================================
 # VÝSTUP
 # ======================================================================
+# Web je zamčený heslem: stránky se po vygenerování zašifrují (tools/protect.mjs) a návštěvník vidí jen vstupní obrazovku.
+# Heslo je v proměnné NK_HESLO nebo v souboru nico-kai-heslo.txt o úroveň výš (mimo web i repozitář).
+# Odemknout web pro veřejnost:  python3 tools/build-pages.py --verejne
+PUBLIC = "--verejne" in sys.argv
+PASSWORD = ""
+if not PUBLIC:
+    PASSWORD = os.environ.get("NK_HESLO", "").strip()
+    _pw_file = os.path.join(os.path.dirname(ROOT), "nico-kai-heslo.txt")
+    if not PASSWORD and os.path.exists(_pw_file):
+        with open(_pw_file, encoding="utf-8") as _f: PASSWORD = _f.read().strip()
+    if not PASSWORD:
+        sys.exit("Web je zamčený heslem, ale heslo chybí: nastavte NK_HESLO nebo soubor ../nico-kai-heslo.txt.\n"
+                 "Nic se nezapsalo. Bez zámku (veřejný web): python3 tools/build-pages.py --verejne")
+
 pages = {"404.html": notfound_page(), "sitemap.xml": sitemap_xml(), "robots.txt": f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n"}
 for lang in LANGS:
     pre = LANG_META[lang]["prefix"]
@@ -803,3 +817,10 @@ for rel, html in pages.items():
     path = os.path.join(ROOT, rel); os.makedirs(os.path.dirname(path) or ROOT, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f: f.write(html)
     print("wrote", rel, len(html))
+
+if PASSWORD:
+    import subprocess
+    locked = [rel for rel in pages if rel.endswith("index.html")]
+    subprocess.run(["node", os.path.join(ROOT, "tools", "protect.mjs"), ROOT] + locked, check=True, env={**os.environ, "NK_HESLO": PASSWORD})
+else:
+    print("POZOR: web je sestavený BEZ zámku heslem (--verejne).")

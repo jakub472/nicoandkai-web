@@ -1,151 +1,121 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-nk-gate>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Datenschutz | Nico &amp; Kai Development</title>
-  <meta name="description" content="Grundsätze der Verarbeitung personenbezogener Daten auf der Website von Nico & Kai Development.">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="color-scheme" content="light">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="de_DE">
-  <meta property="og:site_name" content="Nico &amp; Kai Development">
-  <meta property="og:title" content="Datenschutz | Nico &amp; Kai Development">
-  <meta property="og:description" content="Grundsätze der Verarbeitung personenbezogener Daten auf der Website von Nico & Kai Development.">
-  <meta property="og:image" content="https://nicoandkai.com/assets/img/og.jpg">
-  <meta property="og:url" content="https://nicoandkai.com/de/datenschutz/">
-  <link rel="canonical" href="https://nicoandkai.com/de/datenschutz/">
-  <link rel="alternate" hreflang="cs" href="https://nicoandkai.com/ochrana-osobnich-udaju/">
-  <link rel="alternate" hreflang="en" href="https://nicoandkai.com/en/privacy/">
-  <link rel="alternate" hreflang="de" href="https://nicoandkai.com/de/datenschutz/">
-  <link rel="alternate" hreflang="x-default" href="https://nicoandkai.com/ochrana-osobnich-udaju/">
-  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#000000">
+  <title>Nico &amp; Kai Development</title>
   <link rel="icon" href="../../assets/img/icons/favicon.ico" sizes="48x48">
   <link rel="icon" href="../../assets/img/logo/nk-ikona-cerna.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="../../assets/img/icons/apple-touch-icon.png">
-  <link rel="preload" href="../../assets/fonts/Manrope-Variable.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/styles.css?v=07e73146">
-  <link rel="stylesheet" href="../../assets/css/explorer.css?v=daa64b17">
-  <link rel="stylesheet" href="../../assets/css/site.css?v=cb3b1108">
-  <script>document.documentElement.classList.add('js')</script>
-  <meta name="robots" content="noindex, follow">
+  <script>try{if(localStorage.getItem('nk-gate-key')||sessionStorage.getItem('nk-gate-key'))document.documentElement.className='has-key'}catch(e){}</script>
+  <style>
+    @font-face{font-family:"Manrope";src:url("../../assets/fonts/Manrope-Variable.woff2") format("woff2");font-weight:200 800;font-style:normal;font-display:swap}
+    *,*::before,*::after{box-sizing:border-box}
+    html{background:#000;color:#fff;-webkit-text-size-adjust:100%}
+    html.has-key{background:#fff}
+    body{margin:0;font:400 1.0625rem/1.6 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+    [hidden]{display:none!important}
+    .gate{--pad:clamp(1.25rem,4.2vw,3.75rem);min-height:100vh;min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;gap:2.5rem;padding:max(var(--pad),env(safe-area-inset-top)) max(var(--pad),env(safe-area-inset-right)) max(var(--pad),env(safe-area-inset-bottom)) max(var(--pad),env(safe-area-inset-left))}
+    .gate__logo{display:block;width:168px;height:auto}
+    .gate__box{align-self:center;max-width:46rem;padding-bottom:4vh}
+    .gate__eyebrow{display:flex;align-items:center;gap:.9rem;margin:0 0 clamp(1.5rem,4vw,2.75rem);font-size:.75rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+    .gate__eyebrow::after{content:"";flex:0 0 clamp(2rem,6vw,5rem);height:1px;background:rgba(255,255,255,.4)}
+    .gate h1{margin:0;font-size:clamp(2.5rem,7.4vw,6.5rem);font-weight:800;letter-spacing:-.04em;line-height:.98}
+    .gate h1 span{display:block;font-weight:300;letter-spacing:-.045em}
+    .gate__lead{margin:clamp(1.25rem,3vw,2rem) 0 0;max-width:31em;color:#c9c9c5;text-wrap:pretty}
+    .gate form{margin-top:clamp(2rem,5vw,3.5rem);max-width:31rem}
+    .gate label{display:block;font-size:.75rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c9c9c5}
+    .gate__row{display:flex;align-items:stretch;gap:1rem;margin-top:.5rem}
+    .gate input{flex:1;min-width:0;padding:.85rem 0;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.45);border-radius:0;color:#fff;font:600 1.125rem/1.3 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.1em;outline:none;transition:border-color .3s,box-shadow .3s}
+    .gate input:focus{border-color:#fff;box-shadow:0 1px 0 #fff}
+    .gate button{flex:none;display:inline-flex;align-items:center;justify-content:space-between;gap:1rem;min-height:3.35rem;padding:0 1.5rem;border:1px solid #fff;border-radius:0;background:#fff;color:#000;font:700 .9375rem/1.2 "Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;transition:background .35s,color .35s}
+    .gate button i{font-style:normal;transition:transform .35s}
+    .gate button:hover,.gate button:focus-visible{background:transparent;color:#fff;outline:none}
+    .gate button:hover i{transform:translateX(4px)}
+    .gate button[disabled]{opacity:.6;cursor:progress}
+    .gate__msg{min-height:1.6em;margin:.9rem 0 0;font-size:.9375rem;font-weight:700}
+    .gate__foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin:0;font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8a8a85}
+    .gate__foot nav{display:flex;gap:1.1rem}
+    .gate__foot a{color:inherit;text-decoration:none;padding:.4rem 0;transition:color .3s}
+    .gate__foot a[aria-current],.gate__foot a:hover,.gate__foot a:focus-visible{color:#fff}
+    .gate>*{opacity:0;transform:translateY(16px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+    .gate.is-in>*{opacity:1;transform:none}
+    .gate.is-in>.gate__box{transition-delay:.12s}
+    .gate.is-in>.gate__foot{transition-delay:.3s}
+    .is-wrong .gate__row{animation:nk-shake .4s}
+    @keyframes nk-shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+    @media (max-width:520px){.gate__row{flex-direction:column;gap:1.25rem}}
+    @media (prefers-reduced-motion:reduce){.gate>*{transition:none}.is-wrong .gate__row{animation:none}}
+    noscript p{margin:0;padding:2rem;font-weight:700}
+  </style>
 </head>
 <body>
-  <a class="skip" href="#obsah">Zum Inhalt springen</a>
-  <div class="progress" aria-hidden="true"></div>
-  <header class="site-header" id="header">
-    <div class="wrap site-header__in">
-      <a class="brand" href="../../de/" aria-label="Nico &amp; Kai Development – Startseite">
-        <img class="brand__light" src="../../assets/img/logo/nk-logo-horizontalni-cerne.svg" alt="Nico &amp; Kai Development" width="168" height="30">
-        <img class="brand__dark" src="../../assets/img/logo/nk-logo-horizontalni-bile.svg" alt="" width="168" height="30" aria-hidden="true">
-      </a>
-      <nav class="nav" aria-label="Hauptnavigation">
-        <a href="../../de/#projekty" data-nav="..">Projekte</a>
-        <a href="../../de/ke-schodum/" data-nav="..">Ke Schodům</a>
-        <a href="../../de/do-ctvrti/" data-nav="..">Do Čtvrti</a>
-        <a href="../../de/#kontakt" data-nav="..">Kontakt</a>
-      </nav>
-      <nav class="lang" aria-label="Sprache"><a href="../../ochrana-osobnich-udaju/" hreflang="cs" lang="cs">CS</a><a href="../../en/privacy/" hreflang="en" lang="en">EN</a><a href="../../de/datenschutz/" hreflang="de" lang="de" class="is-active" aria-current="page">DE</a></nav>
-      <a class="btn btn--sm header-cta" href="../../de/#kontakt"><span>Kontakt</span></a>
-      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
-        <span class="menu-btn__label">Menü</span>
-        <span class="menu-btn__icon" aria-hidden="true"><i></i><i></i></span>
-      </button>
-    </div>
-  </header>
-
-  <div class="menu" id="menu" hidden>
-    <nav class="wrap menu__nav" aria-label="Mobile Navigation">
-      <a href="../../de/#projekty"><small>01</small>Projekte</a>
-      <a href="../../de/ke-schodum/"><small>02</small>Ke Schodům</a>
-      <a href="../../de/do-ctvrti/"><small>03</small>Do Čtvrti</a>
-      <a href="../../de/#kontakt"><small>04</small>Kontakt</a>
-    </nav>
-    <div class="wrap"><nav class="lang lang--menu" aria-label="Sprache"><a href="../../ochrana-osobnich-udaju/" hreflang="cs" lang="cs">CS</a><a href="../../en/privacy/" hreflang="en" lang="en">EN</a><a href="../../de/datenschutz/" hreflang="de" lang="de" class="is-active" aria-current="page">DE</a></nav></div>
-  </div>
-
-  <main id="obsah">
-
-    <section class="section legal" id="top">
-      <div class="wrap">
-        <p class="eyebrow" data-reveal>Rechtliche Informationen</p>
-        <h1 class="display display--md"><span class="mask"><span class="mask__in" data-in>Datenschutz-</span></span><span class="mask light"><span class="mask__in" data-in style="--d:.12s">erklärung.</span></span></h1>
-        <div class="legal__body" data-reveal>
-          <p class="lead">Wir schätzen Ihr Interesse an unseren Häusern ebenso wie Ihre Privatsphäre. Hier erfahren Sie, welche Daten wir verarbeiten, warum und welche Rechte Sie haben.</p>
-
-          <h2>1. Wer die Daten verarbeitet</h2>
-          <p>Verantwortlicher für die personenbezogenen Daten ist <strong><span data-cfg="company.legalName">Nico &amp; Kai Development</span></strong><span data-cfg-wrap="company.ico">, IČO <span data-cfg="company.ico"></span></span><span data-cfg-wrap="company.address">, mit Sitz <span data-cfg="company.address"></span></span> („wir“). Bei der Rezidence ke Schodům ist die Verkäuferin die Gesellschaft Rezidence Ke schodům s.r.o., IČO 23662956, Ke schodům 1465/14, 143&nbsp;00 Prag 12 – Modřany, an die wir Ihre Anfrage weiterleiten.</p>
-          <p data-cfg-wrap="company.email">Kontakt in Datenschutzfragen: <a data-cfg="company.email" data-cfg-href="mailto:"></a>.</p>
-          <h2>2. Welche Daten wir verarbeiten</h2>
-          <ul>
-            <li><strong>Formulardaten:</strong> Vor- und Nachname, E-Mail, Telefon (falls angegeben), Nachrichtentext, gewählte Wohnung und Interesse an Garagenstellplatz oder Keller.</li>
-            <li><strong>Technische Daten:</strong> beim Laden der Website verarbeitet der Hosting-Anbieter Ihre IP-Adresse und Browserdaten in den Server-Logs.</li>
-          </ul>
-          <p>Die Website verwendet keine Tracking-Cookies und keine Analysetools Dritter. Ihr Browser merkt sich nur für die Dauer des Besuchs, dass Sie die Startanimation bereits gesehen haben (technisch notwendig, keine personenbezogenen Daten).</p>
-          <h2>3. Warum wir Daten verarbeiten und auf welcher Grundlage</h2>
-          <ul>
-            <li><strong>Beantwortung Ihrer Anfrage und Verhandlung über die Reservierung einer Wohnung</strong> – vorvertragliche Maßnahmen auf Ihre Anfrage (Art. 6 Abs. 1 lit. b DSGVO).</li>
-            <li><strong>Versand von Informationen über das Projekt</strong>, für das Sie sich interessieren (Bauneuigkeiten, Preisliste, Termine) – auf Grundlage Ihrer Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die Einwilligung können Sie jederzeit widerrufen.</li>
-            <li><strong>Betrieb und Sicherheit der Website</strong> – unser berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO).</li>
-          </ul>
-          <h2>4. Wie lange wir Daten aufbewahren</h2>
-          <p>Für die Dauer der Verhandlungen über Reservierung und Kauf einer Wohnung und danach höchstens 3&nbsp;Jahre ab dem letzten Kontakt bzw. bis zum Widerruf der Einwilligung, je nachdem, was früher eintritt. Daten, die Bestandteil eines Vertrags sind, bewahren wir für die gesetzlich vorgeschriebene Dauer auf.</p>
-          <h2>5. An wen wir Daten weitergeben</h2>
-          <ul>
-            <li>An den Verkäufer des jeweiligen Projekts (siehe Punkt 1), damit er mit Ihnen über die Reservierung verhandeln kann.</li>
-            <li>Bei den Apartmány Vysoké an das Maklerbüro Svoboda &amp; Williams, das die letzten Einheiten verkauft.</li>
-            <li>An den Hosting-Anbieter der Website (GitHub, Inc., USA – Server-Logs; die Übermittlung ist durch EU-Standardvertragsklauseln abgesichert) und an den E-Mail-Dienstleister.</li>
-          </ul>
-          <p>Wir verkaufen keine Daten und geben sie nicht für Marketing Dritter weiter.</p>
-          <h2>6. Ihre Rechte</h2>
-          <p>Sie haben das Recht auf Auskunft, Berichtigung oder Löschung Ihrer Daten, auf Einschränkung der Verarbeitung, auf Datenübertragbarkeit, auf Widerspruch sowie das Recht, die Einwilligung jederzeit zu widerrufen (der Widerruf berührt nicht die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung). Schreiben Sie uns einfach. Wenn Sie der Ansicht sind, dass wir Ihre Daten rechtswidrig verarbeiten, können Sie sich bei der tschechischen Datenschutzbehörde beschweren: Úřad pro ochranu osobních údajů, Pplk. Sochora 27, 170&nbsp;00 Prag 7, <a href="https://uoou.gov.cz" rel="noopener" target="_blank">uoou.gov.cz</a>.</p>
-          <h2>7. Änderungen dieser Erklärung</h2>
-          <p>Wir können diese Erklärung anpassen, etwa bei einem Wechsel des Hostings oder der Tools. Die aktuelle Fassung finden Sie stets auf dieser Seite.</p>
-          <p class="legal__date">Gültig ab 21. 11. 2026.</p>
+  <main class="gate" id="gate" hidden>
+    <img class="gate__logo" src="../../assets/img/logo/nk-logo-horizontalni-bile.svg" alt="Nico &amp; Kai Development" width="168" height="30">
+    <div class="gate__box">
+      <p class="gate__eyebrow">Private Vorschau</p>
+      <h1>Diese Website ist<span>passwortgeschützt.</span></h1>
+      <p class="gate__lead">Die Website von Nico &amp; Kai Development ist noch nicht öffentlich. Bitte geben Sie das Passwort ein, das Sie von uns erhalten haben.</p>
+      <form id="gate-form" novalidate>
+        <label for="gate-pw">Passwort</label>
+        <div class="gate__row">
+          <input id="gate-pw" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+          <button type="submit"><span>Eintreten</span><i aria-hidden="true">→</i></button>
         </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer dark">
-    <div class="wrap">
-      <div class="footer__top">
-        <a class="brand" href="../../de/" aria-label="Nico &amp; Kai Development – Startseite">
-          <img src="../../assets/img/logo/nk-logo-horizontalni-bile.svg" alt="Nico &amp; Kai Development" width="168" height="30">
-        </a>
-        <nav class="footer__nav" aria-label="Fußzeile">
-          <a href="../../de/ke-schodum/">Rezidence ke Schodům</a>
-          <a href="../../de/do-ctvrti/">Rezidence Do Čtvrti</a>
-          <a href="../../de/apartmany-vysoke/">Apartmány Vysoké</a>
-          <a href="../../de/rezidence-vlnita/">Rezidence Vlnitá</a>
-          <a href="../../de/datenschutz/">Datenschutz</a>
-        </nav>
-      </div>
-
-      <div class="partners">
-        <div class="partners__item"><small>Architektur</small><img src="../../assets/img/partners/ja-architekti.svg" alt="JA Architekti" style="height:1.6rem;width:auto;filter:invert(1)"></div>
-      </div>
-
-      <ul class="legal-list" data-cfg-group>
-        <li data-cfg-wrap="company.legalName"><span>Gesellschaft</span><span data-cfg="company.legalName"></span></li>
-        <li data-cfg-wrap="company.ico"><span>Firmen-ID (IČO)</span><span data-cfg="company.ico"></span></li>
-        <li data-cfg-wrap="company.dic"><span>USt-IdNr.</span><span data-cfg="company.dic"></span></li>
-        <li data-cfg-wrap="company.address"><span>Sitz</span><span data-cfg="company.address"></span></li>
-        <li data-cfg-wrap="company.email"><span>E-Mail</span><a data-cfg="company.email" data-cfg-href="mailto:"></a></li>
-        <li data-cfg-wrap="company.phone"><span>Telefon</span><a data-cfg="company.phone" data-cfg-href="tel:"></a></li>
-      </ul>
-
-      <p class="footer__note">
-        Die Angaben auf dieser Website dienen nur der Information und stellen kein Angebot zum Vertragsabschluss im Sinne von § 1732 des tschechischen Bürgerlichen Gesetzbuchs dar. Visualisierungen sind unverbindlich; Flächen entsprechen der Projektplanung und können sich ändern.
-      </p>
-      <p class="footer__copy">© <span data-year>2026</span> Nico &amp; Kai Development · <nav class="lang lang--inline" aria-label="Sprache"><a href="../../ochrana-osobnich-udaju/" hreflang="cs" lang="cs">CS</a><a href="../../en/privacy/" hreflang="en" lang="en">EN</a><a href="../../de/datenschutz/" hreflang="de" lang="de" class="is-active" aria-current="page">DE</a></nav></p>
+        <p class="gate__msg" id="gate-msg" role="alert"></p>
+      </form>
     </div>
-    <img class="footer__mark" src="../../assets/img/logo/nk-monogram-bile.svg" alt="" aria-hidden="true">
-  </footer>
-  <script src="../../assets/js/config.js?v=093afc21"></script>
-  <script src="../../assets/i18n/de.js?v=c187c8ab"></script>
-  <script src="../../assets/js/main.js?v=34918966"></script>
-  <script src="../../assets/js/site.js?v=385265ab"></script>
-  <script src="../../assets/js/atmo.js?v=fb3be614" defer></script>
+    <footer class="gate__foot"><span>© Nico &amp; Kai Development</span><nav aria-label="Language"><a href="../../" hreflang="cs" lang="cs">CS</a><a href="../../en/" hreflang="en" lang="en">EN</a><a href="../../de/" aria-current="true" hreflang="de" lang="de">DE</a></nav></footer>
+  </main>
+  <noscript><p>Für diese Website wird JavaScript benötigt.</p></noscript>
+  <script>
+  (async () => {
+    const D = {"s":"BCuit+qFMxvbXpHaz+rnMA==","n":250000,"i":"2SBr4MU29pQLBv78","c":"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"};
+    const T = {"button":"Eintreten","busy":"Wird geprüft…","wrong":"Das Passwort stimmt nicht. Bitte versuchen Sie es erneut.","nocrypto":"Dieser Browser kann die Seite nicht entsperren. Bitte öffnen Sie sie in einer aktuellen Version von Safari oder Chrome."};
+    const K = 'nk-gate-key';
+    const el = (id) => document.getElementById(id);
+    const bytes = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+    const saved = () => { try { return localStorage.getItem(K) || sessionStorage.getItem(K); } catch (e) { return null; } };
+    const remember = (v) => { try { localStorage.setItem(K, v); } catch (e) { try { sessionStorage.setItem(K, v); } catch (e2) { /* soukromý režim */ } } };
+    const forget = () => { try { localStorage.removeItem(K); sessionStorage.removeItem(K); } catch (e) { /* nic */ } };
+    const decrypt = async (raw) => {
+      const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+      return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(D.i) }, key, bytes(D.c)));
+    };
+    const open = (html) => {
+      const hash = location.hash;
+      document.open(); document.write(html); document.close();
+      if (hash.length > 1) setTimeout(() => { const t = document.getElementById(decodeURIComponent(hash.slice(1))); if (t) t.scrollIntoView(); }, 500);
+    };
+    const ok = !!(window.crypto && crypto.subtle);
+    const had = ok && saved();
+    if (had) { try { return open(await decrypt(bytes(had))); } catch (e) { forget(); } }
+
+    document.documentElement.className = '';
+    const gate = el('gate'), form = el('gate-form'), input = el('gate-pw'), msg = el('gate-msg'), btn = form.querySelector('button'), lbl = btn.querySelector('span');
+    gate.hidden = false;
+    setTimeout(() => gate.classList.add('is-in'), 30);
+    if (!ok) { msg.textContent = T.nocrypto; btn.disabled = true; return; }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pw = input.value.replace(/[\s\-\u2010-\u2015_.]/g, '').toUpperCase();
+      if (!pw) { input.focus(); return; }
+      btn.disabled = true; lbl.textContent = T.busy; msg.textContent = ''; form.classList.remove('is-wrong');
+      try {
+        const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
+        const raw = new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: bytes(D.s), iterations: D.n, hash: 'SHA-256' }, base, 256));
+        const html = await decrypt(raw);
+        remember(btoa(String.fromCharCode(...raw)));
+        open(html);
+      } catch (err) {
+        btn.disabled = false; lbl.textContent = T.button; msg.textContent = T.wrong;
+        void form.offsetWidth; form.classList.add('is-wrong');
+        input.select(); input.focus();
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
