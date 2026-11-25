@@ -10,17 +10,14 @@ window.NK_DICT = {
   '1. NP': 'Ground floor', '2. NP': '1st floor', '3. NP': '2nd floor', '1. PP': 'Basement', '2. PP': 'Basement 2',
   '1. nadzemní podlaží': 'Ground floor', '2. nadzemní podlaží': 'First floor', '3. nadzemní podlaží': 'Second floor',
   '1. podzemní podlaží (garáž a sklepy)': 'Basement (garage and cellars)', '1. podzemní podlaží (garáž)': 'Basement (garage)',
-  '2. podzemní podlaží (sklepy a technika)': 'Basement 2 (cellars and utilities)',
-  '16 stání · 8 sklepů': '16 parking spaces · 8 cellars', '7 garážových stání': '7 garage spaces', '6 sklepů': '6 cellars',
+  '7 stání · 6 sklepů': '7 parking spaces · 6 cellars', '16 stání · 8 sklepů': '16 parking spaces · 8 cellars', '7 garážových stání': '7 garage spaces', '6 sklepů': '6 cellars',
   'Garáž a sklepy': 'Garage and cellars', 'Garáž': 'Garage', 'Sklepy a technika': 'Cellars and utilities',
   'Garážová stání': 'Garage spaces', 'Sklepy': 'Cellars', 'Plocha sklepů': 'Cellar sizes', 'Plocha garáže': 'Garage area',
   '1,9 – 5,1 m²': '1.9 – 5.1 m²', '5,8 – 6,5 m²': '5.8 – 6.5 m²', '224,6 m²': '224.6 m²',
   'Garáž je propojená výtahem se všemi podlažími. Stání č.&nbsp;6 je vyhrazené pro osoby s omezenou schopností pohybu. Garážové stání i sklep lze k bytu přikoupit samostatně.':
     'The garage is connected by lift to every floor. Space no.&nbsp;6 is reserved for people with reduced mobility. A garage space and a cellar can be purchased separately with any apartment.',
-  'Garáž v 1. podzemním podlaží se sjezdem z ulice Do čtvrti. Výtah propojuje garáž i všechna podlaží domu.':
-    'Garage on the first basement level with the ramp from Do čtvrti street. The lift connects the garage with every floor of the house.',
-  'Sklepní kóje a technické zázemí domu ve 2. podzemním podlaží. Výtah sem sjíždí z&nbsp;celého domu.':
-    'Cellar units and the building services on the second basement level. The lift runs down here from the whole house.',
+  'Garáž a sklepní kóje v podzemním podlaží se sjezdem z ulice Do čtvrti. Výtah je propojuje se všemi podlažími domu.':
+    'Garage and cellar units on the basement level, with the ramp from Do čtvrti street. The lift connects them with every floor of the house.',
   'Cena stání a sklepů': 'Price of parking spaces and cellars', 'Cena stání': 'Parking space price', 'Cena sklepů': 'Cellar price',
   'Mám zájem o stání / sklep': 'I am interested in a parking space / cellar', 'Mám zájem o stání': 'I am interested in a parking space', 'Mám zájem o sklep': 'I am interested in a cellar',
   'Rezervovat byt': 'Reserve apartment', 'Mám zájem o byt': 'I am interested in apartment',

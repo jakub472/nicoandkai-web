@@ -8,16 +8,13 @@ window.NK_DICT = {
   '1. NP': 'EG', '2. NP': '1. OG', '3. NP': '2. OG', '1. PP': 'UG', '2. PP': '2. UG',
   '1. nadzemní podlaží': 'Erdgeschoss', '2. nadzemní podlaží': '1. Obergeschoss', '3. nadzemní podlaží': '2. Obergeschoss',
   '1. podzemní podlaží (garáž a sklepy)': 'Untergeschoss (Garage und Keller)', '1. podzemní podlaží (garáž)': 'Untergeschoss (Garage)',
-  '2. podzemní podlaží (sklepy a technika)': '2. Untergeschoss (Keller und Technik)',
-  '16 stání · 8 sklepů': '16 Stellplätze · 8 Keller', '7 garážových stání': '7 Garagenstellplätze', '6 sklepů': '6 Keller',
+  '7 stání · 6 sklepů': '7 Stellplätze · 6 Keller', '16 stání · 8 sklepů': '16 Stellplätze · 8 Keller', '7 garážových stání': '7 Garagenstellplätze', '6 sklepů': '6 Keller',
   'Garáž a sklepy': 'Garage und Keller', 'Garáž': 'Garage', 'Sklepy a technika': 'Keller und Technik',
   'Garážová stání': 'Garagenstellplätze', 'Sklepy': 'Keller', 'Plocha sklepů': 'Kellerflächen', 'Plocha garáže': 'Garagenfläche',
   'Garáž je propojená výtahem se všemi podlažími. Stání č.&nbsp;6 je vyhrazené pro osoby s omezenou schopností pohybu. Garážové stání i sklep lze k bytu přikoupit samostatně.':
     'Die Garage ist per Aufzug mit allen Geschossen verbunden. Stellplatz Nr.&nbsp;6 ist für Personen mit eingeschränkter Mobilität reserviert. Garagenstellplatz und Keller können zu jeder Wohnung separat hinzugekauft werden.',
-  'Garáž v 1. podzemním podlaží se sjezdem z ulice Do čtvrti. Výtah propojuje garáž i všechna podlaží domu.':
-    'Garage im 1. Untergeschoss mit Einfahrt von der Straße Do čtvrti. Der Aufzug verbindet die Garage mit allen Geschossen des Hauses.',
-  'Sklepní kóje a technické zázemí domu ve 2. podzemním podlaží. Výtah sem sjíždí z&nbsp;celého domu.':
-    'Kellerabteile und Haustechnik im 2. Untergeschoss. Der Aufzug fährt aus dem ganzen Haus bis hierher.',
+  'Garáž a sklepní kóje v podzemním podlaží se sjezdem z ulice Do čtvrti. Výtah je propojuje se všemi podlažími domu.':
+    'Garage und Kellerabteile im Untergeschoss mit Einfahrt von der Straße Do čtvrti. Der Aufzug verbindet sie mit allen Geschossen des Hauses.',
   'Cena stání a sklepů': 'Preis für Stellplätze und Keller', 'Cena stání': 'Stellplatzpreis', 'Cena sklepů': 'Kellerpreis',
   'Mám zájem o stání / sklep': 'Interesse an Stellplatz / Keller', 'Mám zájem o stání': 'Interesse an einem Stellplatz', 'Mám zájem o sklep': 'Interesse an einem Keller',
   'Rezervovat byt': 'Wohnung reservieren', 'Mám zájem o byt': 'Interesse an Wohnung',

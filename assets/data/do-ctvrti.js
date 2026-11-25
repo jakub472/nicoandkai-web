@@ -2,6 +2,7 @@
 //
 // Zdroj: Dokumentace pro povolení stavby JA ARCHITEKTI (08/2026), tabulky místností 1.NP–3.NP, 2.PP,
 // a souhlasné vyjádření IPR Praha č. j. IPR 12986/2026 (19. 10. 2026): 3 NP, 2 PP, 6 bytů, 7 stání.
+// Web ukazuje jedno podzemní podlaží (1. PP: garáž a sklepy).
 // area = součet místností (studie 05/2026); areaNV = podlahová plocha dle NV 366/2013 Sb., odhad změřený z půdorysů studie (±0,5 m²),
 // soubor BD_Do_ctvrti_plochy_NV366.xlsx. Závazná plocha bude v prohlášení vlastníka.
 //
@@ -16,30 +17,21 @@ window.NK_PROJECTS['do-ctvrti'] = {
   name: 'Rezidence Do Čtvrti',
   place: 'Praha-Modřany',
   planImages: {
-    '2pp': 'plan-2pp.webp', '1pp': 'plan-1pp.webp', '1np': 'plan-1np.webp', '2np': 'plan-2np.webp', '3np': 'plan-3np.webp',
+    '1pp': 'plan-1pp.webp', '1np': 'plan-1np.webp', '2np': 'plan-2np.webp', '3np': 'plan-3np.webp',
   },
 
   floors: [
-    { id: '3np', label: '3. NP', long: '3. nadzemní podlaží', z: 28 },
-    { id: '2np', label: '2. NP', long: '2. nadzemní podlaží', z: 21 },
-    { id: '1np', label: '1. NP', long: '1. nadzemní podlaží', z: 14 },
+    { id: '3np', label: '3. NP', long: '3. nadzemní podlaží', z: 21 },
+    { id: '2np', label: '2. NP', long: '2. nadzemní podlaží', z: 14 },
+    { id: '1np', label: '1. NP', long: '1. nadzemní podlaží', z: 7 },
     {
-      id: '1pp', label: '1. PP', long: '1. podzemní podlaží (garáž)', z: 7, type: 'basement',
-      meta: '7 garážových stání',
-      title: 'Garáž',
-      stats: [['Garážová stání', '7'], ['Plocha garáže', '224,6 m²']],
-      text: 'Garáž v 1. podzemním podlaží se sjezdem z ulice Do čtvrti. Výtah propojuje garáž i všechna podlaží domu.',
-      priceNote: ['Cena stání', 'na vyžádání'],
-      cta: 'Mám zájem o stání',
-    },
-    {
-      id: '2pp', label: '2. PP', long: '2. podzemní podlaží (sklepy a technika)', z: 0, type: 'basement',
-      meta: '6 sklepů',
-      title: 'Sklepy a technika',
-      stats: [['Sklepy', '6'], ['Plocha sklepů', '5,8 – 6,5 m²']],
-      text: 'Sklepní kóje a technické zázemí domu ve 2. podzemním podlaží. Výtah sem sjíždí z&nbsp;celého domu.',
-      priceNote: ['Cena sklepů', 'na vyžádání'],
-      cta: 'Mám zájem o sklep',
+      id: '1pp', label: '1. PP', long: '1. podzemní podlaží (garáž a sklepy)', z: 0, type: 'basement',
+      meta: '7 stání · 6 sklepů',
+      title: 'Garáž a sklepy',
+      stats: [['Garážová stání', '7'], ['Sklepy', '6']],
+      text: 'Garáž a sklepní kóje v podzemním podlaží se sjezdem z ulice Do čtvrti. Výtah je propojuje se všemi podlažími domu.',
+      priceNote: ['Cena stání a sklepů', 'na vyžádání'],
+      cta: 'Mám zájem o stání / sklep',
     },
   ],
 
@@ -107,7 +99,7 @@ window.NK_PROJECTS['do-ctvrti'] = {
     },
   ],
 
-  // 7 stání (1.PP), 6 sklepů (2.PP, místnosti 004–009)
+  // 7 stání a 6 sklepů v 1. PP
   parking: Array.from({ length: 7 }, (_, i) => ({ id: i + 1, status: 'available', price: null })),
   cellars: [5.79, 5.79, 5.79, 6.51, 6.51, 6.51].map((area, i) => ({ id: i + 1, area, status: 'available', price: null })),
 
@@ -125,8 +117,7 @@ window.NK_PROJECTS['do-ctvrti'] = {
       zones: { A: [[245, 240], [705, 240], [705, 545], [925, 545], [925, 1280], [245, 1280]], B: [[1631, 240], [1171, 240], [1171, 545], [951, 545], [951, 1280], [1631, 1280]] },
       anchors: { A: [470, 700], B: [1406, 700] } },
     '1pp': { image: 'plan-1pp.webp', size: [1750, 1519], zones: {}, anchors: {} },
-    '2pp': { image: 'plan-2pp.webp', size: [1750, 1519], zones: {}, anchors: {} },
   },
 
-  facts: { units: 6, floorsAbove: 3, floorsBelow: 2 },
+  facts: { units: 6, floorsAbove: 3, floorsBelow: 1 },
 };
