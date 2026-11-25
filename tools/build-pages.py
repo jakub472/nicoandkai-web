@@ -6,7 +6,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from i18n import LANGS, LANG_META, UI, PROJECTS, HOME, VYSOKE, VLNITA, LEGAL, NOTFOUND
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE_URL = "https://nicoandkai.com"   # ostrá doména (canonical, hreflang, og:url, sitemap)
+SITE_URL = "https://nicoandkai.com"
+
+
+def ver(path):
+    """Otisk obsahu souboru do odkazu (?v=…): po nasazení si prohlížeč stáhne novou verzi místo staré z cache."""
+    import hashlib
+    f = os.path.join(ROOT, path)
+    if not os.path.exists(f):
+        return path
+    with open(f, "rb") as fh:
+        return path + "?v=" + hashlib.md5(fh.read()).hexdigest()[:8]
+   # ostrá doména (canonical, hreflang, og:url, sitemap)
 PAGES = ["home", "ke-schodum", "do-ctvrti", "vysoke", "vlnita", "privacy"]
 
 def page_path(lang, key):
@@ -85,9 +96,9 @@ def head(C, title, desc, og, theme="#000000", extra_css="", extra_head=""):
   <link rel="icon" href="{rel}assets/img/logo/nk-ikona-cerna.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{rel}assets/img/icons/apple-touch-icon.png">
   <link rel="preload" href="{rel}assets/fonts/Manrope-Variable.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="{rel}assets/css/styles.css">
-  <link rel="stylesheet" href="{rel}assets/css/explorer.css">
-  <link rel="stylesheet" href="{rel}assets/css/site.css">{extra_css}
+  <link rel="stylesheet" href="{rel}{ver("assets/css/styles.css")}">
+  <link rel="stylesheet" href="{rel}{ver("assets/css/explorer.css")}">
+  <link rel="stylesheet" href="{rel}{ver("assets/css/site.css")}">{extra_css}
   <script>document.documentElement.classList.add('js')</script>{extra_head}
 </head>
 <body>
@@ -175,12 +186,12 @@ def footer(C, legal_prefix="company", extra_note=""):
 
 def scripts(C, data=(), explorer=False):
     rel = C.rel
-    s = f'  <script src="{rel}assets/js/config.js"></script>\n'
-    if C.lang != "cs": s += f'  <script src="{rel}assets/i18n/{C.lang}.js"></script>\n'
-    for d in data: s += f'  <script src="{rel}assets/data/{d}.js"></script>\n'
-    s += f'  <script src="{rel}assets/js/main.js"></script>\n'
-    if explorer: s += f'  <script src="{rel}assets/js/explorer.js"></script>\n'
-    s += f'  <script src="{rel}assets/js/site.js"></script>\n  <script src="{rel}assets/js/atmo.js" defer></script>\n</body>\n</html>\n'
+    s = f'  <script src="{rel}{ver("assets/js/config.js")}"></script>\n'
+    if C.lang != "cs": s += f'  <script src="{rel}{ver(f"assets/i18n/{C.lang}.js")}"></script>\n'
+    for d in data: s += f'  <script src="{rel}{ver(f"assets/data/{d}.js")}"></script>\n'
+    s += f'  <script src="{rel}{ver("assets/js/main.js")}"></script>\n'
+    if explorer: s += f'  <script src="{rel}{ver("assets/js/explorer.js")}"></script>\n'
+    s += f'  <script src="{rel}{ver("assets/js/site.js")}"></script>\n  <script src="{rel}{ver("assets/js/atmo.js")}" defer></script>\n</body>\n</html>\n'
     return s
 
 def form(C, project, with_unit=True, extras=True, title=("", ""), lead="", how=(), submit="", eyebrow=("05", "")):

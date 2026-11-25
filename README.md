@@ -7,6 +7,12 @@ Statický web bez build kroku (HTML + CSS + JS). Stránky se generují skriptem 
 python3 tools/build-pages.py
 ```
 
+Skript přidává k odkazům na CSS a JS otisk obsahu (`?v=…`), takže po úpravě stylů nebo skriptů je potřeba stránky
+přegenerovat – jinak by prohlížeče (hlavně telefony) dál načítaly starou verzi z cache.
+
+Odhalování při scrollu (`main.js`): sleduje se maska nadpisu, ne posunutý řádek, s prahem 0 – jinak se na telefonu
+zalomené nadpisy a vysoké bloky neodhalí. Prvky s `data-reveal` doplněné skriptem (karty jednotek) hlídá MutationObserver.
+
 ```
 index.html                       úvod: hero, manifest, 4 projekty, jak stavíme, reference + partneři, kontakt
 ke-schodum/index.html            Rezidence ke Schodům – předprodej (fasáda s výběrem bytů, půdorysy, rezervace)

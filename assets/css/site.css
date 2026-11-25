@@ -8,7 +8,7 @@
 .splash__bar i { display: block; height: 100%; width: 0; background: #fff; animation: splash-bar 1.3s cubic-bezier(.65, 0, .35, 1) .1s forwards; }
 @keyframes splash-in { to { opacity: 1; transform: none; } }
 @keyframes splash-bar { to { width: 100%; } }
-html.has-splash body { overflow: hidden; }
+html.has-splash, html.has-splash body { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .splash { display: none; } }
 
 /* ---------- hero s obrazem ---------- */
@@ -236,9 +236,9 @@ html.has-splash body { overflow: hidden; }
 .addr { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: 2rem; margin-top: clamp(2.5rem, 6vw, 5rem); }
 .addr__copy { grid-column: 1 / 6; display: grid; gap: 1rem; align-content: start; }
 .addr__list { grid-column: 7 / 13; display: grid; }
-.addr__list div { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: .9rem 0; border-top: 1px solid var(--line); font-size: .9375rem; }
+.addr__list div { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.5rem; padding: .9rem 0; border-top: 1px solid var(--line); font-size: .9375rem; }
 .addr__list div:last-child { border-bottom: 1px solid var(--line); }
-.addr__list strong { font-weight: 800; white-space: nowrap; }
+.addr__list strong { font-weight: 800; text-align: right; text-wrap: balance; overflow-wrap: anywhere; }
 @media (max-width: 880px) { .addr__copy, .addr__list { grid-column: 1 / -1; } }
 
 /* ---------- drobnosti ---------- */
@@ -247,6 +247,7 @@ html.has-splash body { overflow: hidden; }
 .section--tight { padding-block: clamp(3.5rem, 8vw, 7rem); }
 .section-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1.5rem 3rem; }
 .section-head .display { margin: 0; }
+.eyebrow + .section-head { margin-top: clamp(2rem, 5vw, 4rem); }
 .section-head p { max-width: 34em; color: var(--mute); }
 .dark .section-head p { color: #c9c9c5; }
 .btn--light { background: #fff; color: #000; border-color: #fff; }

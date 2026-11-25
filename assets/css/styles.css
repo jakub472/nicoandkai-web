@@ -41,7 +41,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--hh) + 1rem); }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--hh) + 1rem); overflow-x: hidden; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 
 body {
@@ -106,7 +106,7 @@ p { text-wrap: pretty; }
 /* line mask reveal for headings */
 .mask { display: block; overflow: hidden; padding: 0 .06em .28em; margin: 0 -.06em -.28em; }
 .mask__in { display: inline-block; }
-html.js .mask__in { transform: translateY(105%); }
+html.js .mask__in { transform: translateY(135%); }
 html.js .is-ready .mask__in,
 html.js .mask__in.is-in {
   transform: none;

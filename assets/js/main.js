@@ -82,7 +82,7 @@
     menuBtn.setAttribute('aria-expanded', String(open));
     menuBtn.querySelector('.menu-btn__label').textContent = open ? tr('Zavřít') : tr('Menu');
     menu.hidden = !open;
-    document.body.style.overflow = open ? 'hidden' : '';
+    document.documentElement.style.overflow = open ? 'hidden' : '';
     header.classList.remove('is-hidden');
     if (open) { header.classList.remove('dark'); $('a', menu).focus({ preventScroll: true }); } else onScroll();
   };
@@ -92,15 +92,30 @@
   matchMedia('(min-width: 881px)').addEventListener('change', (m) => { if (m.matches && !menu.hidden) setMenu(false); });
 
   /* ---------- odhalování obsahu ---------- */
+  /* Práh je 0 a u nadpisů se sleduje maska, ne posunutý řádek: z řádku schovaného v masce vidí observer jen proužek
+     a vysoké bloky by na telefonu poměrem viditelné plochy nikdy neprošly. Prvky doplněné skriptem hlídá MutationObserver. */
+  const REVEAL = '[data-reveal], .mask__in[data-in]';
   const revealIO = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (!e.isIntersecting) return;
-      e.target.classList.add('is-in');
-      revealIO.unobserve(e.target);
+      const t = e.target;
+      if (t.classList.contains('mask')) $$('.mask__in', t).forEach((n) => n.classList.add('is-in'));
+      else t.classList.add('is-in');
+      revealIO.unobserve(t);
     });
-  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  }, { rootMargin: '0px 0px -6% 0px', threshold: 0 });
   const hero = $('.hero, .hero-media') || document.body;
-  $$('[data-reveal], .mask__in[data-in]').forEach((el) => { if (!hero.contains(el)) revealIO.observe(el); });
+  const watch = (el) => {
+    if (hero.contains(el) || el.classList.contains('is-in')) return;
+    const mask = el.classList.contains('mask__in') ? el.closest('.mask') : null;
+    revealIO.observe(mask || el);
+  };
+  $$(REVEAL).forEach(watch);
+  new MutationObserver((muts) => muts.forEach((m) => m.addedNodes.forEach((n) => {
+    if (n.nodeType !== 1) return;
+    if (n.matches(REVEAL)) watch(n);
+    $$(REVEAL, n).forEach(watch);
+  }))).observe(document.body, { childList: true, subtree: true });
 
   /* ---------- kresba: nakreslí se po načtení / při příchodu do záběru ---------- */
   const drawings = $$('.drawing');
